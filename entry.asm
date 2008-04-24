@@ -1,5 +1,6 @@
 [BITS 32]
 global start
+start:
 	mov esp, _sys_stack	; set up stack pointer
 	jmp entry		; jump to our entry point
 
@@ -11,6 +12,7 @@ mboot:
 	MB_HEAD_MAGIC	equ 0x1BADB002
 	MB_HEAD_FLAGS	equ MB_PAGE_ALIGN | MB_MEM_INFO | MB_AOUT_KLUDGE
 	MB_CHECKSUM	equ -(MB_HEAD_MAGIC + MB_HEAD_FLAGS)
+	EXTERN code, bss, end
 
 	dd MB_HEAD_MAGIC	; GRUB multiboot header
 	dd MB_HEAD_FLAGS
