@@ -1,18 +1,19 @@
 [BITS 32]
 global start
 start:
+	extern main
 	mov esp, _sys_stack	; set up stack pointer
-	jmp entry		; jump to our entry point
+	call main		; jump to our entry point
 
 ALIGN 4				; make sure we are 4 byte alligned
 mboot:
+	extern code, bss, end
 	MB_PAGE_ALIGN	equ 1<<0
 	MB_MEM_INFO	equ 1<<1
 	MB_AOUT_KLUDGE	equ 1<<16
 	MB_HEAD_MAGIC	equ 0x1BADB002
 	MB_HEAD_FLAGS	equ MB_PAGE_ALIGN | MB_MEM_INFO | MB_AOUT_KLUDGE
 	MB_CHECKSUM	equ -(MB_HEAD_MAGIC + MB_HEAD_FLAGS)
-	EXTERN code, bss, end
 
 	dd MB_HEAD_MAGIC	; GRUB multiboot header
 	dd MB_HEAD_FLAGS
@@ -23,9 +24,6 @@ mboot:
 	dd bss
 	dd end
 	dd start
-
-entry:
-	jmp $			; spin lock, yay!
 
 SECTION .bss
 	resb 8192		; reserve 4kb for our stack

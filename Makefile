@@ -6,10 +6,10 @@ RM=rm
 CFLAGS=-Wall -Werror -g -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -I./include
 LDFLAGS=
 
-all : kernel system.o
+all : kernel
 
-kernel : entry.o
-	$(LD) $(LDFLAGS) -T linker.ld -o kernel.bin entry.o
+kernel : entry.o main.o
+	$(LD) $(LDFLAGS) -T linker.ld -o kernel.bin entry.o main.o
 
 entry.o : entry.asm
 	$(AS) -f aout -o entry.o entry.asm
