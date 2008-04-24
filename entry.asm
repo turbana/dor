@@ -12,7 +12,7 @@ mboot:
 	MB_HEAD_FLAGS	equ MB_PAGE_ALIGN | MB_MEM_INFO | MB_AOUT_KLUDGE
 	MB_CHECKSUM	equ -(MB_HEAD_MAGIC + MB_HEAD_FLAGS)
 
-	dd MB_HEADER_MAGIC	; GRUB multiboot header
+	dd MB_HEAD_MAGIC	; GRUB multiboot header
 	dd MB_HEAD_FLAGS
 	dd MB_CHECKSUM
 
