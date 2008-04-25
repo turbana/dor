@@ -16,10 +16,6 @@
 
 #define VID_MEM			0xB8000
 
-static unsigned short *vidmem;		/* location of video memory */
-static int attr = 0x0F;				/* default to white on black */
-static crs_y = crs_x = 0;			/* cursor starts in top-left */
-
 void scroll(void);
 void move_csr(void);
 void clear(void);
