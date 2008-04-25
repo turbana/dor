@@ -20,7 +20,7 @@ void scroll(void);
 void move_csr(void);
 void clear(void);
 void putch(unsigned char value);
-void puts(unsigned char *text);
+void puts(char *text);
 void set_color(unsigned char foreground, unsigned char background);
 void init_screen(void);
 

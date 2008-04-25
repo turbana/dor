@@ -95,8 +95,8 @@ putch(unsigned char value) {
 }
 
 void
-puts(unsigned char *string) {
-	unsigned char *ptr = string;
+puts(char *string) {
+	char *ptr = string;
 	while(*ptr != '\0') {
 		putch(*ptr++);
 	}
