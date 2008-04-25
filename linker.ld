@@ -5,7 +5,7 @@ SECTIONS {
 	.text phys : AT(phys) {
 		code = .;
 		*(.text)
-		*(.rodata)
+		*(.rodata*)
 		. = ALIGN(4096);
 	}
 	.data : AT(phys + (data - code)) {

@@ -1,0 +1,6 @@
+root (fd0,0)
+default=0
+timeout=0
+
+title Custom Kernel
+	kernel /kernel.bin
