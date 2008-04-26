@@ -7,11 +7,12 @@ GRUB = grub
 MBCHK = mbchk
 
 CFLAGS  = -Wall -Werror -O -g -fstrength-reduce -fomit-frame-pointer \
-	-finline-functions -nostdinc -fno-builtin -I./include
+		  -finline-functions -nostdinc -fno-builtin -I./include
 LDFLAGS =
 ASFLAGS = -f aout
 
-OBJS = boot.o kernel.o screen.o sys.o gdt.o idt.o isrs.o irq.o timer.o
+OBJS = boot.o kernel.o screen.o sys.o gdt.o idt.o isrs.o irq.o timer.o \
+	   keyboard.o
 
 all : run
 

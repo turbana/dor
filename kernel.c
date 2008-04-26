@@ -5,6 +5,7 @@
 #include "irq.h"
 #include "isrs.h"
 #include "timer.h"
+#include "keyboard.h"
 
 void
 k_entry(void) {
@@ -13,6 +14,7 @@ k_entry(void) {
 	isrs_install();
 	irq_install();
 	timer_install();
+	keyboard_install();
 	scr_init();
 
 	__asm__ __volatile__ ("sti");
