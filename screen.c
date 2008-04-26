@@ -4,7 +4,7 @@
 /* VGA tutorial: http://www.brackeen.com/home/vga */
 
 static unsigned short *vidmem;		/* location of video memory */
-static int attributes = 0x0F00;		/* default to white on black */
+static int attributes = 0x0700;		/* default to grey on black */
 static int crs_y = 0;				/* cursor starts in top-left */
 static int crs_x = 0;
 
