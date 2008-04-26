@@ -13,5 +13,9 @@ k_entry(void) {
 	irq_install();
 	scr_init();
 
+	__asm__ __volatile__ ("sti");
+
 	scr_puts("Hello Ian.\n");
+
+	for(;;);		/* spin baby, spin */
 }
