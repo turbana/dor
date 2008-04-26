@@ -15,10 +15,10 @@ timer_phase(unsigned int hz) {
 
 void
 timer_handler(struct regs *registers) {
-	static unsigned char color = COLOR_BLACK;
+//	static unsigned char color = COLOR_BLACK;
 	timer_ticks++;
 
-	if(timer_ticks % 100 == 0) {
+/*	if(timer_ticks % 100 == 0) {
 		color = (color + 1) % 8;
 		scr_set_color(COLOR_GREY, COLOR_BLACK);
 		scr_puts("One ");
@@ -26,7 +26,7 @@ timer_handler(struct regs *registers) {
 		scr_puts("second");
 		scr_set_color(COLOR_GREY, COLOR_BLACK);
 		scr_puts(" has passed.\n");
-	}
+	}*/
 }
 
 void timer_install() {
