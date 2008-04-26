@@ -13,7 +13,9 @@ ASFLAGS = -f aout
 
 OBJS = entry.o main.o screen.o system.o
 
-all : kernel.bin
+all : run
+
+kernel : kernel.bin
 
 run : fdimage.img
 	qemu -fda fdimage.img
@@ -27,7 +29,7 @@ fdimage.img : kernel.bin grub/stage1 grub/stage2 grub/menu.lst
 	MTOOLSRC=mtoolsrc mcopy grub/* a:/boot/grub/
 	MTOOLSRC=mtoolsrc mcopy kernel.bin a:/
 	echo "(fd0) fdimage.img" > bmap
-	echo -e "root (fd0)\nsetup (fd0)\nquit" | $(GRUB) --batch --device-map=bmap
+	echo "root (fd0)\nsetup (fd0)\nquit" | $(GRUB) --batch --device-map=bmap
 	$(RM) mtoolsrc bmap
 
 grub/% :
