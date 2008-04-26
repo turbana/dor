@@ -9,6 +9,7 @@ start:
 	extern k_entry
 	mov esp, _sys_stack	; set up stack pointer
 	call k_entry		; jump to our entry point
+	cli
 	hlt
 
 
