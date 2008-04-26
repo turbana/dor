@@ -334,7 +334,7 @@ global irq15
 irq0:
 	cli			; disable interrupts
 	push byte 0		; no error code
-	push byte 32		; interrupts will start at 30
+	push byte 32		; interrupts will start at 32
 	jmp irq_common
 
 irq1:
