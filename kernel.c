@@ -10,5 +10,9 @@ k_entry(void) {
 	idt_install();
 	isrs_install();
 	scr_init();
-	scr_puts("Hello Ian.");
+	scr_puts("Hello Ian.\n");
+
+	/* test ISR handler */
+	int n = 0;
+	scr_putch(1 / n);
 }
