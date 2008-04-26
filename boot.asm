@@ -39,6 +39,12 @@ gdt_flush:
 	jmp 0x08:flush		; far jump into our code segment
 flush:	ret
 
+global idt_load			; setup the IDT
+extern idtp
+idt_load:
+	lidt [idtp]
+	ret
+
 SECTION .bss
 	resb 8192		; reserve 4kb for our stack
 _sys_stack:			; and set our stack pointer to the end
