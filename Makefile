@@ -11,7 +11,7 @@ CFLAGS  = -Wall -Werror -O -g -fstrength-reduce -fomit-frame-pointer \
 LDFLAGS =
 ASFLAGS = -f aout
 
-OBJS = boot.o kernel.o screen.o sys.o gdt.o idt.o
+OBJS = boot.o kernel.o screen.o sys.o gdt.o idt.o isrs.o
 
 all : run
 
