@@ -1,9 +1,9 @@
 [BITS 32]
 global start
 start:
-	extern main
+	extern k_entry
 	mov esp, _sys_stack	; set up stack pointer
-	call main		; jump to our entry point
+	call k_entry		; jump to our entry point
 	hlt
 
 ALIGN 4				; make sure we are 4 byte alligned

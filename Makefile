@@ -11,7 +11,7 @@ CFLAGS  = -Wall -Werror -O -g -fstrength-reduce -fomit-frame-pointer \
 LDFLAGS =
 ASFLAGS = -f aout
 
-OBJS = entry.o main.o screen.o system.o
+OBJS = boot.o kernel.o screen.o sys.o
 
 all : run
 
@@ -36,11 +36,11 @@ grub/% :
 	cp /boot/$@ ./$@
 
 kernel.bin : $(OBJS)
-	$(LD) $(LDFLAGS) -T linker.ld -o kernel.bin $(OBJS)
+	$(LD) $(LDFLAGS) -T kernel.ld -o kernel.bin $(OBJS)
 	$(MBCHK) kernel.bin > /dev/null
 
-entry.o : entry.asm
-	$(AS) $(ASFLAGS) -o entry.o entry.asm
+boot.o : boot.asm
+	$(AS) $(ASFLAGS) -o boot.o boot.asm
 
 %.o : %.c include/%.h
 	$(CC) $(CFLAGS) -c $<

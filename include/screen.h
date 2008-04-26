@@ -16,12 +16,12 @@
 
 #define VID_MEM			0xB8000
 
-void scroll(void);
-void move_csr(void);
-void clear(void);
-void putch(unsigned char value);
-void puts(char *text);
-void set_color(unsigned char foreground, unsigned char background);
-void init_screen(void);
+void scr_scroll(void);
+void scr_update_csr(void);
+void scr_clear(void);
+void scr_putch(char value);
+void scr_puts(char *text);
+void scr_set_color(unsigned char foreground, unsigned char background);
+void scr_init(void);
 
 #endif

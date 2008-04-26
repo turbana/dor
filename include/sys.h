@@ -16,9 +16,9 @@ size_t
 strlen(const char *string);
 
 unsigned char
-inportb(unsigned short _port);
+inb(unsigned short _port);
 
 void
-outportb(unsigned short _port, unsigned char _data);
+outb(unsigned short _port, unsigned char _data);
 
 #endif

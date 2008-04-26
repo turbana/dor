@@ -1,4 +1,4 @@
-#include "system.h"
+#include "sys.h"
 
 void *
 memcpy(void *dest, const void *source, size_t count) {
@@ -30,13 +30,13 @@ strlen(const char *string) {
 }
 
 unsigned char
-inportb(unsigned short _port) {
+inb(unsigned short _port) {
 	unsigned char ret;
 	__asm__ __volatile__ ("inb %1, %0" : "=a" (ret) : "dN" (_port));
 	return ret;
 }
 
 void
-outportb(unsigned short _port, unsigned char _data) {
+outb(unsigned short _port, unsigned char _data) {
 	__asm__ __volatile__ ("outb %1, %0" : : "dN" (_port), "a" (_data));
 }

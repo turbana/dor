@@ -1,5 +1,5 @@
 #include "screen.h"
-#include "system.h"
+#include "sys.h"
 
 /* VGA tutorial: http://www.brackeen.com/home/vga */
 
@@ -9,7 +9,7 @@ static int crs_y = 0;				/* cursor starts in top-left */
 static int crs_x = 0;
 
 void
-scroll(void) {
+scr_scroll(void) {
 	unsigned short blank, temp;
 
 	/* we only need to scroll when the cursor has gone off the screen */
@@ -29,20 +29,20 @@ scroll(void) {
 }
 
 void
-move_crs(void) {
+scr_update_csr(void) {
 	unsigned short location;
 
 	location = crs_y * 80 + crs_x;
 
 	/* tell the VGA controller to move the cursor to the specified location */
-	outportb(0x3D4, 14);
-	outportb(0x3D5, location >> 8);
-	outportb(0x3D4, 15);
-	outportb(0x3D5, location);
+	outb(0x3D4, 14);
+	outb(0x3D5, location >> 8);
+	outb(0x3D4, 15);
+	outb(0x3D5, location);
 }
 
 void
-clear(void) {
+scr_clear(void) {
 	unsigned short blank;
 	int row;
 
@@ -53,11 +53,11 @@ clear(void) {
 	}
 
 	crs_y = crs_x = 0;
-	move_crs();
+	scr_update_csr();
 }
 
 void
-putch(unsigned char value) {
+scr_putch(char value) {
 	unsigned short *ptr;
 	
 	if(value == 0x08) {			/* backspace */
@@ -83,25 +83,25 @@ putch(unsigned char value) {
 		crs_y++;
 	}
 
-	scroll();
-	move_crs();
+	scr_scroll();
+	scr_update_csr();
 }
 
 void
-puts(char *string) {
+scr_puts(char *string) {
 	char *ptr = string;
 	while(*ptr != '\0') {
-		putch(*ptr++);
+		scr_putch(*ptr++);
 	}
 }
 
 void
-set_color(unsigned char foreground, unsigned char background) {
+scr_set_color(unsigned char foreground, unsigned char background) {
 	attributes = ((background << 4) | (foreground & 0x0F)) << 8;
 }
 
 void
-init_screen(void) {
+scr_init(void) {
 	vidmem = (unsigned short *)VID_MEM;
-	clear();
+	scr_clear();
 }
