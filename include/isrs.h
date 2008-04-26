@@ -41,7 +41,7 @@ struct regs {
 	unsigned int edi, esi, ebp, esp;	/* stack pointers */
 	unsigned int ebx, edx, ecx, eax;	/* registers */
 	unsigned int int_no, err_code;		/* interrupt number and error code */
-	unsigned int eip, cs, eflags, userep, ss; /* processor flags */
+	unsigned int eip, cs, eflags, useresp, ss; /* processor flags */
 };
 
 void isrs_install();
