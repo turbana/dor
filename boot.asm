@@ -26,6 +26,19 @@ mboot:
 	dd end
 	dd start
 
+global gdt_flush		; setup the GDT
+extern gp
+gdt_flush:
+	lgdt [gp]		; load the GDT with our GDT pointer struct
+	mov ax, 0x10		; 0x10 is our data segment in the GDT
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
+	jmp 0x08:flush		; far jump into our code segment
+flush:	ret
+
 SECTION .bss
 	resb 8192		; reserve 4kb for our stack
 _sys_stack:			; and set our stack pointer to the end
