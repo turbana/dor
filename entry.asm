@@ -4,6 +4,7 @@ start:
 	extern main
 	mov esp, _sys_stack	; set up stack pointer
 	call main		; jump to our entry point
+	hlt
 
 ALIGN 4				; make sure we are 4 byte alligned
 mboot:

@@ -4,8 +4,6 @@
 int
 main(void) {
 	init_screen();
-	puts("Hello Ian.\n");
-	/* spin baby, spin! */
-	for(;;);
+	puts("Hello Ian.");
 	return 0;
 }
