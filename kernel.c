@@ -4,6 +4,7 @@
 #include "idt.h"
 #include "irq.h"
 #include "isrs.h"
+#include "timer.h"
 
 void
 k_entry(void) {
@@ -11,6 +12,7 @@ k_entry(void) {
 	idt_install();
 	isrs_install();
 	irq_install();
+	timer_install();
 	scr_init();
 
 	__asm__ __volatile__ ("sti");
