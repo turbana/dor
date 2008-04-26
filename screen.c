@@ -3,17 +3,10 @@
 
 /* VGA tutorial: http://www.brackeen.com/home/vga */
 
-//unsigned short *vidmem;		/* location of video memory */
-//int attributes = 0x0F;		/* default to white on black */
-//int crs_y = 0;				/* cursor starts in top-left */
-//int crs_x = 0;
-
 static unsigned short *vidmem;		/* location of video memory */
 static int attributes = 0x0F;		/* default to white on black */
 static int crs_y = 0;				/* cursor starts in top-left */
 static int crs_x = 0;
-
-
 
 void
 scroll(void) {
