@@ -13,7 +13,7 @@ LDFLAGS =
 ASFLAGS = -f aout
 
 OBJS = boot.o kernel.o screen.o sys.o gdt.o idt.o isrs.o irq.o timer.o \
-	   keyboard.o kalloc.o
+	   keyboard.o kalloc.o test_kalloc.o
 
 all : run
 
