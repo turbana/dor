@@ -22,6 +22,11 @@ kernel : kernel.bin
 run : fdimage.img
 	qemu -fda fdimage.img
 
+debug : fdimage.img
+	qemu -s -S -fda fdimage.img 2>/dev/null &
+	sleep 1
+	gdb kernel.bin
+
 fdimage.img : kernel.bin grub/stage1 grub/stage2 grub/menu.lst
 	$(DD) if=/dev/zero of=fdimage.img bs=512 count=2880
 	echo 'drive a: file="fdimage.img"' > mtoolsrc
@@ -48,4 +53,4 @@ boot.o : boot.asm
 	$(CC) $(CFLAGS) -c $<
 
 clean :
-	-$(RM) kernel.bin *.o fdimage.img grub/stage[12]
+	-$(RM) kernel.bin *.o fdimage.img grub/stage[12] core*

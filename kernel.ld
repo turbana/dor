@@ -1,4 +1,3 @@
-OUTPUT_FORMAT("binary")		/* we want a flat file */
 ENTRY(start)			/* where do we first jump to? */
 phys = 0x00100000;		/* load us at 1mb */
 SECTIONS {
