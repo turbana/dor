@@ -62,18 +62,17 @@ dump_mem(void *low_mem, size_t length) {
 	memset(row, ' ', 81);
 	row[80] = '\0';
 
+	scr_puts("Memory dump of 0x");
+	scr_putp32(low_mem);
+	scr_puts(" to 0x");
+	scr_putp32(high);
+	scr_puts(":\n");
+
 	do {
-		/* print the memory address */
 		if(col == 0) {
-			row[col++] = char_map[((unsigned int)ptr >> 28) & 0xF];
-			row[col++] = char_map[((unsigned int)ptr >> 24) & 0xF];
-			row[col++] = char_map[((unsigned int)ptr >> 20) & 0xF];
-			row[col++] = char_map[((unsigned int)ptr >> 16) & 0xF];
-			row[col++] = char_map[((unsigned int)ptr >> 12) & 0xF];
-			row[col++] = char_map[((unsigned int)ptr >> 8) & 0xF];
-			row[col++] = char_map[((unsigned int)ptr >> 4) & 0xF];
-			row[col++] = char_map[(unsigned int)ptr & 0xF];
-			col++;
+			/* print the memory address */
+			scr_putp32(ptr);
+			col = 9;
 		}
 
 		/* hex value */
@@ -98,7 +97,7 @@ dump_mem(void *low_mem, size_t length) {
 
 		/* check for end of line */
 		if(col == 60) {
-			scr_puts(row);
+			scr_puts(row + 8);
 			/* reset the line */
 			memset(row, ' ', 80);
 			col = 0;
