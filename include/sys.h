@@ -21,4 +21,7 @@ inb(unsigned short _port);
 void
 outb(unsigned short _port, unsigned char _data);
 
+void
+dump_mem(void *low_mem, size_t length);
+
 #endif

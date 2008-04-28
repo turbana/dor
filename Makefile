@@ -7,7 +7,8 @@ GRUB = grub
 MBCHK = mbchk
 
 CFLAGS  = -Wall -Werror -O -g -fstrength-reduce -fomit-frame-pointer \
-		  -finline-functions -nostdinc -fno-builtin -I./include
+		  -finline-functions -nostdinc -fno-builtin -fno-stack-protector \
+		  -I./include
 LDFLAGS =
 ASFLAGS = -f aout
 
@@ -30,7 +31,7 @@ fdimage.img : kernel.bin grub/stage1 grub/stage2 grub/menu.lst
 	MTOOLSRC=mtoolsrc mcopy grub/* a:/boot/grub/
 	MTOOLSRC=mtoolsrc mcopy kernel.bin a:/
 	echo "(fd0) fdimage.img" > bmap
-	echo "root (fd0)\nsetup (fd0)\nquit" | $(GRUB) --batch --device-map=bmap
+	echo -e "root (fd0)\nsetup (fd0)\nquit" | $(GRUB) --batch --device-map=bmap
 	$(RM) mtoolsrc bmap
 
 grub/% :
