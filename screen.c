@@ -96,6 +96,28 @@ scr_puts(char *string) {
 }
 
 void
+scr_putp32(void *ptr) {
+	char char_map[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+					   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+	unsigned int mem = (unsigned int)ptr;
+	char row[9];
+	int col = 0;
+
+	row[8] = '\0';
+
+	row[col++] = char_map[((unsigned int)mem >> 28) & 0xF];
+	row[col++] = char_map[((unsigned int)mem >> 24) & 0xF];
+	row[col++] = char_map[((unsigned int)mem >> 20) & 0xF];
+	row[col++] = char_map[((unsigned int)mem >> 16) & 0xF];
+	row[col++] = char_map[((unsigned int)mem >> 12) & 0xF];
+	row[col++] = char_map[((unsigned int)mem >> 8) & 0xF];
+	row[col++] = char_map[((unsigned int)mem >> 4) & 0xF];
+	row[col++] = char_map[(unsigned int)mem & 0xF];
+
+	scr_puts(row);
+}
+
+void
 scr_set_color(unsigned char foreground, unsigned char background) {
 	attributes = ((background << 4) | (foreground & 0x0F)) << 8;
 }

@@ -23,5 +23,6 @@ void scr_putch(char value);
 void scr_puts(char *text);
 void scr_set_color(unsigned char foreground, unsigned char background);
 void scr_init(void);
+void scr_putp32(void *ptr);
 
 #endif
