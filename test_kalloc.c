@@ -61,7 +61,7 @@ test_kalloc_merge() {
 		FAIL("last kalloc(16) returned NULL");
 	}
 
-	/* last small alloc should be contiguos with larger alloc */
+	/* last small alloc should be contiguous with larger alloc */
 	if(loc2 != loc1 + 16 * 65) { /* 65 to account for kalloc bookkeeping */
 		kfree(loc1);
 		kfree(loc2);
