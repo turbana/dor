@@ -53,4 +53,4 @@ boot.o : boot.asm
 	$(CC) $(CFLAGS) -c $<
 
 clean :
-	-$(RM) kernel.bin *.o fdimage.img grub/stage[12] core*
+	-$(RM) kernel.bin *.o fdimage.img core*
