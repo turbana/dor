@@ -73,6 +73,15 @@ test_kalloc_merge() {
 }
 
 int
+test_kalloc_large_alloc() {
+	void *ptr = kalloc(0xF0000000);
+	if(ptr != (void *)0) {
+		FAIL("kalloc(0xF0000000) returned non-NULL");
+	}
+	PASS();
+}
+
+int
 run_test(char *name, int (*test)(void)) {
 	scr_set_color(COLOR_GREY, COLOR_BLACK);
 	scr_puts("Testing ");
@@ -84,9 +93,10 @@ run_test(char *name, int (*test)(void)) {
 
 int
 test_kalloc_suite() {
-	char *names[] = {"same alloc", "stress merge"};
-	int (*funcs[])(void) = {test_kalloc_same_alloc, test_kalloc_merge};
-	int num_tests = 2;
+	char *names[] = {"same alloc", "stress merge", "large alloc"};
+	int (*funcs[])(void) = {test_kalloc_same_alloc, test_kalloc_merge,
+							test_kalloc_large_alloc};
+	int num_tests = 3;
 	int i;
 
 	scr_puts("Test suite for kalloc:\n");
