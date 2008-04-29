@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+	echo "USAGE $0 <image file>"
+	echo
+	echo "Checks image file for GRUB installation"
+	exit 1
+fi
+
+MAGIC=`hexdump -s 0x17F -n 4 -c -e '"%4.4s"' $1 | tail -n1 | awk '{print $1}'`
+
+if [ "$MAGIC" != "GRUB" ]; then
+	echo "$0: GRUB installation not detected in $1" >&2
+	echo "$0: Removing $1" >&2
+	rm $1
+	exit 1
+fi

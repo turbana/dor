@@ -4,6 +4,7 @@ AS    := nasm
 RM    := rm
 DD    := dd
 GRUB  := grub
+CHKGRUB := scripts/chkgrub
 MBCHK := mbchk
 ECHO  := /bin/echo
 CP    := cp
@@ -64,6 +65,7 @@ fdimage.img : $(BDIR) kernel.bin grub/stage1 grub/stage2 grub/menu.lst
 	@$(ECHO) "(fd0) fdimage.img" > bmap
 	@$(ECHO) -e "root (fd0)\nsetup (fd0)\nquit" | \
 		$(GRUB) --batch --device-map=bmap > /dev/null
+	@$(CHKGRUB) fdimage.img
 	@$(RM) mtoolsrc bmap
 
 grub/% :
