@@ -3,7 +3,7 @@
 
 #define FAIL(message) \
 	scr_set_color(COLOR_RED | COLOR_BRIGHT, COLOR_BLACK); \
-	scr_puts("FAILED\n"); \
+	scr_puts("\rFAIL\n"); \
 	scr_puts(message); \
 	scr_putch('\n'); \
 	scr_set_color(COLOR_GREY, COLOR_BLACK); \
@@ -12,7 +12,7 @@
 
 #define PASS() \
 	scr_set_color(COLOR_GREEN | COLOR_BRIGHT, COLOR_BLACK); \
-	scr_puts("PASS\n"); \
+	scr_puts("\rPASS\n"); \
 	return 1;
 
 int test_kalloc_suite();

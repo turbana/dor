@@ -84,9 +84,8 @@ test_kalloc_large_alloc() {
 int
 run_test(char *name, int (*test)(void)) {
 	scr_set_color(COLOR_GREY, COLOR_BLACK);
-	scr_puts("Testing ");
+	scr_puts("     | ");
 	scr_puts(name);
-	scr_puts("... ");
 
 	return test();
 }
