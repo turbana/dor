@@ -10,56 +10,61 @@ struct memnode {
 struct memnode *free_list;
 struct memnode *used_list;
 
+#include "screen.h"
+
 void *
 kalloc(size_t size) {
 	struct memnode *cur, *used, new;
 	unsigned char *loc;
 	void *addr = (void *)0;
 
+	/* find the first node that will fit the alloc */
 	for(cur = free_list->next; cur != free_list; cur = cur->next) {
-		/* does this node have room for the alloc, and the next free node? */
 		if(cur->size >= size + sizeof(struct memnode)) {
-			/* make our new free node */
-			memcpy(new.message, "FREE", 4);
-
-			/* the size is whatever it used to be minus the new alloc */
-			new.size = cur->size - (size + sizeof(struct memnode));
-
-			/* where is it going in memory? */
-			loc = (unsigned char *)cur + size + sizeof(struct memnode);
-
-			/* insert it into the free list */
-			new.prev = cur->prev;
-			cur->prev->next = (struct memnode *)loc;
-			new.next = cur->next;
-			cur->next->prev = (struct memnode *)loc;
-
-			/* copy it to memory */
-			memcpy(loc, &new, sizeof(struct memnode));
-
-			/* set current node to used */
-			memcpy(cur->message, "USED", 4);
-			cur->size = size;
-
-			/* return the current location */
-			addr = (void *)cur + sizeof(struct memnode);
-
-			/* add used node to used list, sorted by memory address */
-
-			/* find node after we need to insert the used node */
-			used = used_list->next;
-			while(used < cur && used != used_list) {
-				used = used->next;
-			}
-
-			/* insert node */
-			used->prev->next = cur;
-			cur->prev = used->prev;
-			used->prev = cur;
-			cur->next = used;
-
 			break;
 		}
+	}
+
+	/* was the needed room found, or did we wrap around? */
+	if(cur != free_list) {
+		/* make our new free node */
+		memcpy(new.message, "FREE", 4);
+
+		/* the size is whatever it used to be minus the new alloc */
+		new.size = cur->size - (size + sizeof(struct memnode));
+
+		/* where is it going in memory? */
+		loc = (unsigned char *)cur + size + sizeof(struct memnode);
+
+		/* insert it into the free list */
+		new.prev = cur->prev;
+		cur->prev->next = (struct memnode *)loc;
+		new.next = cur->next;
+		cur->next->prev = (struct memnode *)loc;
+
+		/* copy it to memory */
+		memcpy(loc, &new, sizeof(struct memnode));
+
+		/* set current node to used */
+		memcpy(cur->message, "USED", 4);
+		cur->size = size;
+
+		/* return the current location */
+		addr = (void *)cur + sizeof(struct memnode);
+
+		/* add used node to used list, sorted by memory address */
+
+		/* find node after we need to insert the used node */
+		used = used_list->next;
+		while(used < cur && used != used_list) {
+			used = used->next;
+		}
+
+		/* insert node */
+		used->prev->next = cur;
+		cur->prev = used->prev;
+		used->prev = cur;
+		cur->next = used;
 	}
 	
 	return addr;
