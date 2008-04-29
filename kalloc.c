@@ -108,19 +108,23 @@ kfree(void *ptr) {
 
 	/* we can merge left if the previous pointer is not the free list and
 	 * the previous pointer plus it's size is the current pointer */
-	if(cur->prev != free_list &&
+	while(cur->prev != free_list &&
 			(void *)(cur->prev) + cur->prev->size + ssize == cur) {
 		cur->prev->next = cur->next;
 		cur->next->prev = cur->prev;
 		cur->prev->size += ssize + cur->size;
 #ifdef KALLOC_CLEAR
+		loc = (void *)cur->prev;
 		memset(cur, 0, ssize);
+		cur = (struct memnode *)loc;
+#else
+		cur = cur->prev;
 #endif
 	}
 
 	/* we can merge right if the next pointer is not the free list and
 	 * the current pointer plus it's size is the next pointer */
-	if(cur->next != free_list &&
+	while(cur->next != free_list &&
 			(void *)cur + cur->size + ssize == cur->next) {
 #ifdef KALLOC_CLEAR
 		loc = (void *)(cur->next);
