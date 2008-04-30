@@ -88,8 +88,6 @@ $(BDIR) :
 	@echo "DIR  $@"
 	@mkdir $@
 
-kernel.bin : $(SDIR)/kernel.ld
-
 kernel.bin : $(addprefix $(BDIR)/, $(OBJS))
 	@echo "LINK $@"
 	@$(LD) $(LDFLAGS) -T $(SDIR)/kernel.ld -o kernel.bin $^
