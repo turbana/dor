@@ -34,7 +34,7 @@ QFLAGS  := -m 32 -no-kqemu
 VPATH := $(SDIR)
 
 # don't assume these targets are files
-.PHONY: kernel all run debug
+.PHONY: kernel all run debug version
 
 # include dependencies created by gcc (*.d files)
 -include $(DEPS)
@@ -42,6 +42,18 @@ VPATH := $(SDIR)
 all : run
 
 kernel : kernel.bin
+
+version :
+	@echo "Build tools versions:"
+	@echo "---------------------"
+	@echo "KERNEL " `git tag`
+	@echo "CC     " `$(CC) -v 2>&1 | tail -n1`
+	@echo "LD     " `$(LD) -v`
+	@echo "AS     " `$(AS) -v`
+	@echo "QEMU   " `$(QEMU) | head -n1`
+	@echo "GRUB   " `$(GRUB) --version`
+	@echo "MAKE   " `$(MAKE) --version | head -n1`
+	@echo "MTOOLS " `mtools --version | head -n1`
 
 run : fdimage.img
 	@echo "RUN  qemu"
@@ -76,8 +88,6 @@ grub/% :
 $(BDIR) :
 	@echo "DIR  $@"
 	@mkdir $@
-
-kernel.bin : $(SDIR)/kernel.ld
 
 kernel.bin : $(addprefix $(BDIR)/, $(OBJS))
 	@echo "LINK $@"
