@@ -1,14 +1,11 @@
 
-BASE	equ 0xF0000000		; base address of kernel
+BASE	equ 0xC0000000		; base address of kernel
 
-;.386P				; use 386+ privileged instuctions
+[BITS 32]
+;[SECTION .data]
+	
 
-;SECTION .text
-
-;SECTION .text
-
-;[BITS 16]
-
+[SECTION .text]
 ;;; MUTLTI BOOT HEADER
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -30,50 +27,29 @@ mboot:
 	dd code			; the linker will fill these in
 	dd bss
 	dd end
-	dd entry16
-
-
-;;; BASE KERNEL PAGE DIRECTORY / PAGE TABLE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;	ORG 0x3000
-
-ALIGN 4096
-
-PD:	times 1024 dd 0		; page directory
-PT:	times 1024 dd 0		; page table
-
-
-;;; ENTRY POINT (16 bit real mode)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;SECTION .text
-;	ORG 0x5000
-;ALIGN 4096
-
-global entry16
-entry16:
-
-	;;; XXX what about loading the GDT here?
-
-	mov eax, cr0		; activate protected mode
-	or ax, 1
-	mov cr0, eax
-	jmp $+2			; flush instruction queue
-
-	db 0x66
-	db 0xEA
-	dd entry32 - BASE
-	dw 0x08
+	dd entry
 
 
 ;;; ENTRY POINT (32 bit protected mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-[BITS 32]
+;[SECTION .text]
+;	ORG 0x5000
+;ALIGN 4096
 
+global entry
 extern k_entry
-entry32:
+entry:
+	lgdt [fgdt_ptr]		; load the fake GDT
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
+	jmp 0x08:tophalf
+
+tophalf:
 	mov esp, _sys_stack	; set up stack pointer
 
 	mov eax, PD - BASE	; Store PT in PD[0] and PD[960]
@@ -103,6 +79,17 @@ initpt:	stosd
 ;	call k_entry		; jump to our entry point
 	cli
 	hlt
+
+
+;;; BASE KERNEL PAGE DIRECTORY / PAGE TABLE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;	ORG 0x3000
+
+ALIGN 4096
+
+PD:	times 1024 dd 0		; page directory
+PT:	times 1024 dd 0		; page table
 
 
 ;;; GDT SETUP
@@ -520,8 +507,20 @@ irq_common:
 	popa
 	add esp, 8
 	iret
-	
 
-SECTION .bss
+
+[SECTION .setup]		; linker loads this into low address
+
+fgdt_ptr:
+	dw fgdt_end - fgdt - 1
+	dw fgdt
+
+fgdt:	dd 0, 0
+	db 0xFF, 0xFF, 0, 0, 0, 10011010b, 11001111b, 0x40
+	db 0xFF, 0xFF, 0, 0, 0, 10010010b, 11001111b, 0x40
+fgdt_end:
+
+
+[SECTION .bss]
 	resb 8192		; reserve 8kb for our stack
 _sys_stack:			; and set our stack pointer to the end
