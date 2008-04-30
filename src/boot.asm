@@ -523,5 +523,5 @@ irq_common:
 	
 
 SECTION .bss
-	resb 8192		; reserve 4kb for our stack
+	resb 8192		; reserve 8kb for our stack
 _sys_stack:			; and set our stack pointer to the end
