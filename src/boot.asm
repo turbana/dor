@@ -13,16 +13,23 @@ MB_CHECKSUM	equ -(MB_HEAD_MAGIC + MB_HEAD_FLAGS)
 
 [SECTION .setup]		; linker loads this into low memory
 
+
 ;;; FAKE GDT
+;;; We set this up to add 0x40000000 to all memory references before we turn
+;;; on paging. We do this because we want the kernel to live in high memory,
+;;; (0xC01...) but we get loaded into low memory (0x001...). So when we make a
+;;; high memory reference (0xC01...) we add 0x40... to it, the integer wraps
+;;; around, and we get our low physical memory reference (0x001...).
+;;; (see `include/gdt.h' for an explanation of the GDT descriptor layout)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 fgdt_ptr:
 	dw fgdt_end - fgdt - 1
-	dd K_PHYS + fgdt
+	dd fgdt
 
 fgdt:	dd 0, 0
-	db 0xFF, 0xFF, 0, 0, 0, 10011010b, 11001111b, 0x40
-	db 0xFF, 0xFF, 0, 0, 0, 10010010b, 11001111b, 0x40
+	dd 0xFF, 0xFF, 0, 0, 0, 10011010b, 11001111b, 0x40
+	dd 0xFF, 0xFF, 0, 0, 0, 10010010b, 11001111b, 0x40
 fgdt_end:
 
 
@@ -35,15 +42,15 @@ ALIGN 4
 	dd MB_CHECKSUM
 
 
-[SECTION .text]
-
 ;;; ENTRY POINT (32 bit protected mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+[SECTION .text]
+
 global entry
 extern k_entry
-entry:
-	lgdt [K_PHYS + fgdt_ptr] ; load the fake GDT
+entry:				; execution starts in low memory
+	lgdt [fgdt_ptr]		; load the fake GDT
 	mov ax, 0x10
 	mov ds, ax
 	mov es, ax
@@ -51,58 +58,13 @@ entry:
 	mov gs, ax
 	mov ss, ax
 
-	jmp $			; STOPS HERE!!!
-	jmp 0x08:.tophalf
-
-.tophalf:			; we are now executing in high memory
-;	mov esp, _sys_stack	; set up stack pointer
-	mov esp, K_PHYS + _sys_stack	; set up stack pointer
-
-;	call k_entry		; jump to our entry point
-;	cli
-;	hlt
-
-	mov eax, K_PHYS + PD	; Store PT in PD[0] and PD[960]
-	mov ebx, K_PHYS + PT + 3
-	mov [eax], ebx		; PD[0] = &PT
-	mov eax, K_PHYS + PD + K_PTE * 4
-	mov [eax], ebx		; PD[960] = &PT
-
-	mov edi, K_PHYS + PT	; PT covers first 4mb physical memory
-	mov eax, 3		; Addr (0) P (1) R/W (1)
-	mov ecx, 1024		; loop 1024 times
-.initpt:
-	stosd
-	add eax, 0x1000
-	loop .initpt
-
-	mov eax, K_PHYS + PD	; load PD
-	mov cr3, eax
-
-	mov eax, cr0
-	or eax, 0x80000000	; paging bit
-	mov cr0, eax		; turn on paging
-	jmp $+2			; flush instruction queue
-
-	push k_entry
-	ret
-
-;	call k_entry		; jump to our entry point
+	jmp 0x08:.highmem
+.highmem:			; we are now executing in high memory
+	mov esp, _sys_stack	; set up stack pointer
+	call k_entry		; jump to our entry point
 	cli
 	hlt
 
-
-;;; BASE KERNEL PAGE DIRECTORY / PAGE TABLE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;	ORG 0x3000
-[SECTION .data]
-ALIGN 4096
-
-PD:	times 1024 dd 0		; page directory
-PT:	times 1024 dd 0		; page table
-
-[SECTION .text]
 
 ;;; GDT SETUP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

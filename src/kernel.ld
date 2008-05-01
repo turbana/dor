@@ -1,27 +1,28 @@
 OUTPUT_FORMAT("elf32-i386")
 ENTRY(entry)
 virt = 0xC0000000;
-phys = 0x00101000;
+phys = 0x00100000;
+page = 0x00001000;
 
 SECTIONS {
-	.setup ALIGN(4) : AT(phys - 4096) {
+	.setup phys : AT(phys) {
 		*(.setup)
 	}
-	.text virt : AT(phys) {
+	.text virt + phys + page : AT(phys + page) {
 		code = .;
 		*(.text)
 		*(.rodata*)
-		. = ALIGN(4096);
+		. = ALIGN(page);
 	}
-	.data : AT(phys + (data - code)) {
+	.data : AT(phys + page + (data - code)) {
 		data = .;
 		*(.data)
-		. = ALIGN(4096);
+		. = ALIGN(page);
 	}
-	.bss : AT(phys + (bss - code)) {
+	.bss : AT(phys + page + (bss - code)) {
 		bss = .;
 		*(.bss)
-		. = ALIGN(4096);
+		. = ALIGN(page);
 	}
 	end = .;
 }
