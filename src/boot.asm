@@ -1,71 +1,82 @@
-
-BASE	equ 0xC0000000		; base address of kernel
-
 [BITS 32]
-;[SECTION .data]
-	
 
-[SECTION .text]
-;;; MUTLTI BOOT HEADER
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+K_VIRT		equ 0xC0000000	; base address of kernel (virtual)
+K_PHYS		equ 0x00100000	; base address of kernel (physical)
+K_PTE		equ K_VIRT>>22	; PD index of kernel PT
 
 MB_PAGE_ALIGN	equ 1<<0
 MB_MEM_INFO	equ 1<<1
-MB_AOUT_KLUDGE	equ 1<<16
 MB_HEAD_MAGIC	equ 0x1BADB002
-MB_HEAD_FLAGS	equ MB_PAGE_ALIGN | MB_MEM_INFO | MB_AOUT_KLUDGE
+MB_HEAD_FLAGS	equ MB_PAGE_ALIGN | MB_MEM_INFO
 MB_CHECKSUM	equ -(MB_HEAD_MAGIC + MB_HEAD_FLAGS)
 
-ALIGN 4				; make sure we are 4 byte alligned
-extern code, bss, end
-mboot:
-	dd MB_HEAD_MAGIC	; multiboot header
+
+[SECTION .setup]		; linker loads this into low memory
+
+;;; FAKE GDT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+fgdt_ptr:
+	dw fgdt_end - fgdt - 1
+	dd K_PHYS + fgdt
+
+fgdt:	dd 0, 0
+	db 0xFF, 0xFF, 0, 0, 0, 10011010b, 11001111b, 0x40
+	db 0xFF, 0xFF, 0, 0, 0, 10010010b, 11001111b, 0x40
+fgdt_end:
+
+
+;;; MUTLTI BOOT HEADER
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ALIGN 4
+	dd MB_HEAD_MAGIC
 	dd MB_HEAD_FLAGS
 	dd MB_CHECKSUM
 
-	dd mboot		; AOUT kludge - must be physical addresses
-	dd code			; the linker will fill these in
-	dd bss
-	dd end
-	dd entry
 
+[SECTION .text]
 
 ;;; ENTRY POINT (32 bit protected mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;[SECTION .text]
-;	ORG 0x5000
-;ALIGN 4096
-
 global entry
 extern k_entry
 entry:
-	lgdt [fgdt_ptr]		; load the fake GDT
+	lgdt [K_PHYS + fgdt_ptr] ; load the fake GDT
 	mov ax, 0x10
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
-	jmp 0x08:tophalf
 
-tophalf:
-	mov esp, _sys_stack	; set up stack pointer
+	jmp $			; STOPS HERE!!!
+	jmp 0x08:.tophalf
 
-	mov eax, PD - BASE	; Store PT in PD[0] and PD[960]
-	mov ebx, PT - BASE + 3
+.tophalf:			; we are now executing in high memory
+;	mov esp, _sys_stack	; set up stack pointer
+	mov esp, K_PHYS + _sys_stack	; set up stack pointer
+
+;	call k_entry		; jump to our entry point
+;	cli
+;	hlt
+
+	mov eax, K_PHYS + PD	; Store PT in PD[0] and PD[960]
+	mov ebx, K_PHYS + PT + 3
 	mov [eax], ebx		; PD[0] = &PT
-	mov eax, PD - BASE + 960 * 4
+	mov eax, K_PHYS + PD + K_PTE * 4
 	mov [eax], ebx		; PD[960] = &PT
 
-	mov edi, PT - BASE	; PT covers first 4mb physical memory
+	mov edi, K_PHYS + PT	; PT covers first 4mb physical memory
 	mov eax, 3		; Addr (0) P (1) R/W (1)
 	mov ecx, 1024		; loop 1024 times
-initpt:	stosd
+.initpt:
+	stosd
 	add eax, 0x1000
-	loop initpt
+	loop .initpt
 
-	mov eax, PD - BASE	; load PD
+	mov eax, K_PHYS + PD	; load PD
 	mov cr3, eax
 
 	mov eax, cr0
@@ -85,12 +96,13 @@ initpt:	stosd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;	ORG 0x3000
-
+[SECTION .data]
 ALIGN 4096
 
 PD:	times 1024 dd 0		; page directory
 PT:	times 1024 dd 0		; page table
 
+[SECTION .text]
 
 ;;; GDT SETUP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -105,8 +117,8 @@ gdt_flush:
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
-	jmp 0x08:flush		; far jump into our code segment
-flush:	ret
+	jmp 0x08:.flush		; far jump into our code segment
+.flush:	ret
 
 
 ;;; IDT SETUP
@@ -509,17 +521,8 @@ irq_common:
 	iret
 
 
-[SECTION .setup]		; linker loads this into low address
-
-fgdt_ptr:
-	dw fgdt_end - fgdt - 1
-	dw fgdt
-
-fgdt:	dd 0, 0
-	db 0xFF, 0xFF, 0, 0, 0, 10011010b, 11001111b, 0x40
-	db 0xFF, 0xFF, 0, 0, 0, 10010010b, 11001111b, 0x40
-fgdt_end:
-
+;;; KERNEL STACK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 [SECTION .bss]
 	resb 8192		; reserve 8kb for our stack
