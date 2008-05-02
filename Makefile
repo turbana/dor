@@ -60,7 +60,7 @@ run : fdimage.img
 
 debug : fdimage.img
 	@echo "RUN  qemu debug"
-	@$(QEMU) $(QFLAGS) -s -S -fda fdimage.img
+	@$(QEMU) $(QFLAGS) -s -S -fda fdimage.img &
 	@sleep 1
 	@echo "GDB  kernel.bin"
 	@$(GDB) kernel.bin
