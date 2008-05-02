@@ -65,6 +65,8 @@ struct page_entry {
 #define PAGE_RW			0x02
 #define PAGE_PRESENT	0x01
 
+#define VIRT_TO_PHYS(loc) ((void *)loc + 0x40000000)
+
 void write_page_entry(unsigned int *, struct page_entry *);
 void install_paging();
 

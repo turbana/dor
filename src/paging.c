@@ -6,7 +6,7 @@
  * table and page directory are aligned on pages.
  */
 static unsigned int lowmem_pt[1024] __attribute__((aligned (4096)));
-unsigned int kernel_pd[1024] __attribute__((aligned (4096)));
+static unsigned int kernel_pd[1024] __attribute__((aligned (4096)));
 
 void
 write_page_entry(unsigned int *dest, struct page_entry *entry) {
@@ -24,20 +24,23 @@ install_paging() {
 	for(i = 0; i < 1024; i++) {
 		/* load lowmem page table ... */
 		table_entry.base_address = i * 4096;
-		write_page_entry(lowmem_pt[i], &table_entry);
+		write_page_entry(lowmem_pt + i, &table_entry);
 		/* ... and clear the kernel page directory */
 		kernel_pd[i] = 0;
 	}
 
-	/* load the kernel page directory with the low mem page table */
-	dir_entry.base_address = (unsigned int)lowmem_pt;
-	write_page_entry(kernel_pd[0], &dir_entry);
-	write_page_entry(kernel_pd[768], &dir_entry);
+	/* Load the kernel page directory with the low mem page table.
+	 * As paging is not yet enabled we need a physical address for the base
+	 * address. */
+	dir_entry.base_address = (unsigned int)VIRT_TO_PHYS(lowmem_pt);
+	write_page_entry(kernel_pd + 0, &dir_entry);
+	write_page_entry(kernel_pd + 768, &dir_entry);
 
-	/* this is here because we need a pointer to the kernel's page directory,
+	/* This is here because we need a pointer to the kernel's page directory,
 	 * but the pointer needs to live on the stack in order to use it in inline
-	 * assembler. */
-	void *page_dir_ptr = kernel_pd;
+	 * assembler. It also must by a physical address as paging hasn't yet been
+	 * enabled when we use the pointer. */
+	void *page_dir_ptr = VIRT_TO_PHYS(kernel_pd);
 
 	__asm__ __volatile__ ("mov %0, %%eax\n\t"
 						  "mov %%eax, %%cr3\n\t"		/* use kernel's PD */
