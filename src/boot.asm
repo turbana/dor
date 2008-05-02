@@ -28,8 +28,8 @@ fgdt_ptr:
 	dd fgdt
 
 fgdt:	dd 0, 0
-	dd 0xFF, 0xFF, 0, 0, 0, 10011010b, 11001111b, 0x40
-	dd 0xFF, 0xFF, 0, 0, 0, 10010010b, 11001111b, 0x40
+	db 0xFF, 0xFF, 0, 0, 0, 10011010b, 11001111b, 0x40
+	db 0xFF, 0xFF, 0, 0, 0, 10010010b, 11001111b, 0x40
 fgdt_end:
 
 
