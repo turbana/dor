@@ -7,11 +7,13 @@
 #include "timer.h"
 #include "keyboard.h"
 #include "kalloc.h"
+#include "paging.h"
 
 #include "test_kalloc.h"
 
 void
 k_entry(void) {
+	install_paging();
 	gdt_install();
 	idt_install();
 	isrs_install();

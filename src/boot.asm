@@ -1,106 +1,67 @@
+[BITS 32]
 
-BASE	equ 0xF0000000		; base address of kernel
+K_VIRT		equ 0xC0000000	; base address of kernel (virtual)
+K_PHYS		equ 0x00100000	; base address of kernel (physical)
+K_PTE		equ K_VIRT>>22	; PD index of kernel PT
 
-;.386P				; use 386+ privileged instuctions
+MB_PAGE_ALIGN	equ 1<<0
+MB_MEM_INFO	equ 1<<1
+MB_HEAD_MAGIC	equ 0x1BADB002
+MB_HEAD_FLAGS	equ MB_PAGE_ALIGN | MB_MEM_INFO
+MB_CHECKSUM	equ -(MB_HEAD_MAGIC + MB_HEAD_FLAGS)
 
-;SECTION .text
 
-;SECTION .text
+[SECTION .setup]		; linker loads this into low memory
 
-;[BITS 16]
+
+;;; FAKE GDT
+;;; We set this up to add 0x40000000 to all memory references before we turn
+;;; on paging. We do this because we want the kernel to live in high memory,
+;;; (0xC01...) but we get loaded into low memory (0x001...). So when we make a
+;;; high memory reference (0xC01...) we add 0x40... to it, the integer wraps
+;;; around, and we get our low physical memory reference (0x001...).
+;;; (see `include/gdt.h' for an explanation of the GDT descriptor layout)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+fgdt_ptr:
+	dw fgdt_end - fgdt - 1
+	dd fgdt
+
+fgdt:	dd 0, 0
+	db 0xFF, 0xFF, 0, 0, 0, 10011010b, 11001111b, 0x40
+	db 0xFF, 0xFF, 0, 0, 0, 10010010b, 11001111b, 0x40
+fgdt_end:
+
 
 ;;; MUTLTI BOOT HEADER
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-MB_PAGE_ALIGN	equ 1<<0
-MB_MEM_INFO	equ 1<<1
-MB_AOUT_KLUDGE	equ 1<<16
-MB_HEAD_MAGIC	equ 0x1BADB002
-MB_HEAD_FLAGS	equ MB_PAGE_ALIGN | MB_MEM_INFO | MB_AOUT_KLUDGE
-MB_CHECKSUM	equ -(MB_HEAD_MAGIC + MB_HEAD_FLAGS)
-
-ALIGN 4				; make sure we are 4 byte alligned
-extern code, bss, end
-mboot:
-	dd MB_HEAD_MAGIC	; multiboot header
+ALIGN 4
+	dd MB_HEAD_MAGIC
 	dd MB_HEAD_FLAGS
 	dd MB_CHECKSUM
-
-	dd mboot		; AOUT kludge - must be physical addresses
-	dd code			; the linker will fill these in
-	dd bss
-	dd end
-	dd entry16
-
-
-;;; BASE KERNEL PAGE DIRECTORY / PAGE TABLE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;	ORG 0x3000
-
-ALIGN 4096
-
-PD:	times 1024 dd 0		; page directory
-PT:	times 1024 dd 0		; page table
-
-
-;;; ENTRY POINT (16 bit real mode)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;SECTION .text
-;	ORG 0x5000
-;ALIGN 4096
-
-global entry16
-entry16:
-
-	;;; XXX what about loading the GDT here?
-
-	mov eax, cr0		; activate protected mode
-	or ax, 1
-	mov cr0, eax
-	jmp $+2			; flush instruction queue
-
-	db 0x66
-	db 0xEA
-	dd entry32 - BASE
-	dw 0x08
 
 
 ;;; ENTRY POINT (32 bit protected mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-[BITS 32]
+[SECTION .text]
 
+global entry
 extern k_entry
-entry32:
+entry:				; execution starts in low memory
+	lgdt [fgdt_ptr]		; load the fake GDT
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
+
+	jmp 0x08:.highmem
+.highmem:			; we are now executing in high memory
 	mov esp, _sys_stack	; set up stack pointer
-
-	mov eax, PD - BASE	; Store PT in PD[0] and PD[960]
-	mov ebx, PT - BASE + 3
-	mov [eax], ebx		; PD[0] = &PT
-	mov eax, PD - BASE + 960 * 4
-	mov [eax], ebx		; PD[960] = &PT
-
-	mov edi, PT - BASE	; PT covers first 4mb physical memory
-	mov eax, 3		; Addr (0) P (1) R/W (1)
-	mov ecx, 1024		; loop 1024 times
-initpt:	stosd
-	add eax, 0x1000
-	loop initpt
-
-	mov eax, PD - BASE	; load PD
-	mov cr3, eax
-
-	mov eax, cr0
-	or eax, 0x80000000	; paging bit
-	mov cr0, eax		; turn on paging
-	jmp $+2			; flush instruction queue
-
-	push k_entry
-	ret
-
-;	call k_entry		; jump to our entry point
+	call k_entry		; jump to our entry point
 	cli
 	hlt
 
@@ -118,8 +79,8 @@ gdt_flush:
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
-	jmp 0x08:flush		; far jump into our code segment
-flush:	ret
+	jmp 0x08:.flush		; far jump into our code segment
+.flush:	ret
 
 
 ;;; IDT SETUP
@@ -520,8 +481,11 @@ irq_common:
 	popa
 	add esp, 8
 	iret
-	
 
-SECTION .bss
+
+;;; KERNEL STACK
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[SECTION .bss]
 	resb 8192		; reserve 8kb for our stack
 _sys_stack:			; and set our stack pointer to the end

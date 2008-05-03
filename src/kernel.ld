@@ -1,22 +1,28 @@
-OUTPUT_FORMAT("binary")		/* we need to be a flat binary */
-ENTRY(entry16)			/* where do we first jump to? */
-phys = 0xF0000000;		/* load us at RAM - 256mb */
+OUTPUT_FORMAT("elf32-i386")
+ENTRY(entry)
+virt = 0xC0000000;
+phys = 0x00100000;
+page = 0x00001000;
+
 SECTIONS {
-	.text phys : AT(phys) {
+	.setup phys : AT(phys) {
+		*(.setup)
+	}
+	.text virt + phys + page : AT(phys + page) {
 		code = .;
 		*(.text)
 		*(.rodata*)
-		. = ALIGN(4096);
+		. = ALIGN(page);
 	}
-	.data : AT(phys + (data - code) + 0x6000) {
+	.data : AT(phys + page + (data - code)) {
 		data = .;
 		*(.data)
-		. = ALIGN(4096);
+		. = ALIGN(page);
 	}
-	.bss : AT(phys + (bss - code) + 0x6000) {
+	.bss : AT(phys + page + (bss - code)) {
 		bss = .;
 		*(.bss)
-		. = ALIGN(4096);
+		. = ALIGN(page);
 	}
 	end = .;
 }
