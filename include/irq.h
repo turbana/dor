@@ -22,7 +22,7 @@ extern void irq15();
 void irq_install_handler(int, void(*)(struct regs *));
 void irq_uninstall_handler(int);
 void irq_remap();
-void irq_install();
+void irq_init();
 void irq_handler(struct regs *);
 
 #endif

@@ -14,16 +14,16 @@
 
 void
 k_entry(void) {
-	install_paging();
-	gdt_install();
-	idt_install();
-	isrs_install();
-	irq_install();
-	scr_init();
+	paging_init();
+	gdt_init();
+	idt_init();
+	isrs_init();
+	irq_init();
+	screen_init();
 	kalloc_init();
-	timer_install();
+	timer_init();
 
-	keyboard_install();
+	keyboard_init();
 
 	__asm__ __volatile__ ("sti");
 

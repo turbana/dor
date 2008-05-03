@@ -31,6 +31,6 @@ keyboard_handler(struct regs *registers) {
 	}
 }
 
-void keyboard_install() {
+void keyboard_init() {
 	irq_install_handler(1, keyboard_handler);
 }

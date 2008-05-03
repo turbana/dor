@@ -123,7 +123,7 @@ scr_set_color(unsigned char foreground, unsigned char background) {
 }
 
 void
-scr_init(void) {
+screen_init(void) {
 	vidmem = (unsigned short *)VID_MEM;
 	scr_clear();
 }

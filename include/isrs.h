@@ -44,7 +44,7 @@ struct regs {
 	unsigned int eip, cs, eflags, useresp, ss; /* processor flags */
 };
 
-void isrs_install();
+void isrs_init();
 void fault_handler(struct regs *);
 
 #endif

@@ -43,7 +43,7 @@ char *exception_messages[] = {
 
 
 void
-isrs_install() {
+isrs_init() {
 	idt_set_gate(0,  (unsigned int)isr0, 0x08, 0x8E);
 	idt_set_gate(1,  (unsigned int)isr1, 0x08, 0x8E);
 	idt_set_gate(2,  (unsigned int)isr2, 0x08, 0x8E);

@@ -32,7 +32,7 @@ irq_remap() {
 	outb(0xA1, 0x0);
 }
 
-void irq_install() {
+void irq_init() {
 	irq_remap();
 	idt_set_gate(32, (unsigned int)irq0,  0x08, 0x8E);
 	idt_set_gate(33, (unsigned int)irq1,  0x08, 0x8E);

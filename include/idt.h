@@ -20,6 +20,6 @@ struct idt_ptr idtp;
 extern void idt_load();				/* defined in boot.asm */
 
 void idt_set_gate(unsigned char, unsigned long, unsigned short, unsigned char);
-void idt_install();
+void idt_init();
 
 #endif

@@ -15,7 +15,7 @@ idt_set_gate(unsigned char num, unsigned long base, unsigned short segment,
 }
 
 void
-idt_install() {
+idt_init() {
 	/* setup the IDT pointer */
 	idtp.limit = (sizeof(struct idt_entry) * 256) - 1;
 	idtp.base = (unsigned int)&idt;

@@ -107,6 +107,6 @@ extern void gdt_flush();		/* defined in boot.asm */
 
 void gdt_set_gate(int, unsigned long, unsigned long, unsigned char,
 				  unsigned char);
-void gdt_install();
+void gdt_init();
 
 #endif

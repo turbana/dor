@@ -29,7 +29,7 @@ timer_handler(struct regs *registers) {
 	}*/
 }
 
-void timer_install() {
+void timer_init() {
 	irq_install_handler(0, timer_handler);	/* install our tick function */
 	timer_phase(100);						/* set the clock to 100mhz */
 }

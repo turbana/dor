@@ -3,6 +3,6 @@
 #include "isrs.h"
 
 void keyboard_handler(struct regs *);
-void keyboard_install();
+void keyboard_init();
 
 #endif

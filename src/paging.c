@@ -14,7 +14,7 @@ write_page_entry(unsigned int *dest, struct page_entry *entry) {
 }
 
 void
-install_paging() {
+paging_init() {
 	int i;
 	struct page_entry dir_entry, table_entry;
 

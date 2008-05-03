@@ -18,7 +18,7 @@ gdt_set_gate(int num, unsigned long base, unsigned long limit,
 }
 
 void
-gdt_install() {
+gdt_init() {
 	/* setup GDT pointer */
 	gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
 	gp.base = (unsigned int)&gdt;
