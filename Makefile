@@ -98,7 +98,7 @@ $(BDIR)/%.o : %.asm
 	@echo "AS   $(<F)"
 	@$(AS) $(ASFLAGS) $< -o $@
 
-$(BDIR)/%.o : %.c
+$(BDIR)/%.o : %.c $(IDIR)/%.h
 	@echo "CC   $(<F)"
 	@$(CC) $(CFLAGS) -MMD -MP -MT "build/$(@F)" -c $< -o $@
 
