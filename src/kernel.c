@@ -1,3 +1,4 @@
+#include "kernel.h"
 #include "sys.h"
 #include "screen.h"
 #include "gdt.h"
