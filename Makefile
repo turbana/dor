@@ -15,12 +15,13 @@ SDIR := src
 IDIR := include
 BDIR := build
 
-SRCS := $(shell find $(SDIR) -mindepth 1 -name "*.c")
-HDRS := $(shell find $(IDIR) -mindepth 1 -name "*.h")
-ASMS := $(shell find $(SDIR) -mindepth 1 -name "*.asm")
-OBJS := $(notdir $(patsubst %.c,   %.o, $(SRCS)) \
-				 $(patsubst %.asm, %.o, $(ASMS)))
-DEPS := $(patsubst %.c, %.d, $(SRCS))
+SRCS  := $(shell find $(SDIR) -mindepth 1 -name "*.c")
+HDRS  := $(shell find $(IDIR) -mindepth 1 -name "*.h")
+ASMS  := $(shell find $(SDIR) -mindepth 1 -name "*.asm")
+OBJS  := $(notdir $(patsubst %.c,   %.o, $(SRCS)) \
+				  $(patsubst %.asm, %.o, $(ASMS)))
+BOBJS := $(addprefix $(BDIR)/, $(OBJS))
+DEPS  := $(patsubst %.c, %.d, $(SRCS))
 CLEAN := $(OBJS) $(DEPS) kernel.bin fdimage.img core* $(BDIR)
 
 CFLAGS  := -Wall -Werror -O -g -fstrength-reduce -fomit-frame-pointer \
@@ -89,9 +90,9 @@ $(BDIR) :
 	@echo "DIR  $@"
 	@mkdir $@
 
-kernel.bin : $(addprefix $(BDIR)/, $(OBJS))
+kernel.bin : $(BOBJS) $(SDIR)/kernel.ld
 	@echo "LINK $@"
-	@$(LD) $(LDFLAGS) -T $(SDIR)/kernel.ld -o kernel.bin $^
+	@$(LD) $(LDFLAGS) -T $(SDIR)/kernel.ld -o kernel.bin $(BOBJS)
 	@$(MBCHK) kernel.bin > /dev/null
 
 $(BDIR)/%.o : %.asm
