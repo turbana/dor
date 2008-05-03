@@ -1,5 +1,5 @@
-#ifndef __H_KALLOC
-#define __H_KALLOC
+#ifndef __KALLOC_H
+#define __KALLOC_H
 
 #include "sys.h"
 

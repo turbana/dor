@@ -1,5 +1,5 @@
-#ifndef __H_PAGING
-#define __H_PAGING
+#ifndef __PAGING_H
+#define __PAGING_H
 
 /*
  * The following diagrams was taken from ``Intel(c) 64 and IA-32 Architectures

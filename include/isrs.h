@@ -1,5 +1,5 @@
-#ifndef __H_ISRS
-#define __H_ISRS
+#ifndef __ISRS_H
+#define __ISRS_H
 
 /* all ISRs are defined in boot.asm */
 extern void isr0();

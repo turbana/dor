@@ -1,5 +1,5 @@
-#ifndef __H_GDT
-#define __H_GDT
+#ifndef __GDT_H
+#define __GDT_H
 
 /*
  * Global Descriptor Table

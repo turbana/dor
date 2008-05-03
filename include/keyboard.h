@@ -1,5 +1,5 @@
-#ifndef __H_KEYBOARD
-#define __H_KEYBOARD
+#ifndef __KEYBOARD_H
+#define __KEYBOARD_H
 #include "isrs.h"
 
 void keyboard_handler(struct regs *);

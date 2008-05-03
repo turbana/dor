@@ -1,5 +1,5 @@
-#ifndef __H_TIMER
-#define __H_TIMER
+#ifndef __TIMER_H
+#define __TIMER_H
 #include "isrs.h"
 
 void timer_phase(unsigned int);

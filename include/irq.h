@@ -1,5 +1,5 @@
-#ifndef __H_IRQ
-#define __H_IRQ
+#ifndef __IRQ_H
+#define __IRQ_H
 #include "isrs.h"
 
 extern void irq0();

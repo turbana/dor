@@ -1,5 +1,5 @@
-#ifndef __H_KERNEL
-#define __H_KERNEL
+#ifndef __KERNEL_H
+#define __KERNEL_H
 
 void k_entry(void);
 

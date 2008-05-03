@@ -1,5 +1,5 @@
-#ifndef __H_TEST_KALLOC
-#define __H_TEST_KALLOC
+#ifndef __TEST_KALLOC_H
+#define __TEST_KALLOC_H
 
 #define FAIL(message) \
 	scr_set_color(COLOR_RED | COLOR_BRIGHT, COLOR_BLACK); \
