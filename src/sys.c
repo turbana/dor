@@ -4,36 +4,36 @@
 
 void *
 memcpy(void *dest, const void *source, size_t count) {
-	const char *sptr = (const char *)source;
+	const u8int *sptr = (const u8int *)source;
 	char *dptr = (char *)dest;
 	while(count-- > 0) *dptr++ = *sptr++;
 	return dest;
 }
 
 void *
-memset(void *dest, char value, size_t count) {
-	char *ptr = (char *)dest;
+memset(void *dest, u8int value, size_t count) {
+	u8int *ptr = (u8int *)dest;
 	while(count-- > 0) *ptr++ = value;
 	return dest;
 }
 
-unsigned short *
-memsetw(unsigned short *dest, unsigned short value, size_t count) {
-	unsigned short *ptr = (unsigned short *)dest;
+u16int *
+memsetw(u16int *dest, u16int value, size_t count) {
+	u16int *ptr = (u16int *)dest;
 	while(count-- > 0) *ptr++ = value;
 	return dest;
 }
 
 size_t
-strlen(const char *string) {
+strlen(const u8int *string) {
 	size_t size;
 	for(size=0; *string != '\0'; string++) size++;
 	return size;
 }
 
-unsigned char
-inb(unsigned short _port) {
-	unsigned char ret;
+u8int
+inb(u16int _port) {
+	u8int ret;
 	ASM("inb %1, %0"
 		: "=a" (ret)
 		: "dN" (_port));
@@ -41,7 +41,7 @@ inb(unsigned short _port) {
 }
 
 void
-outb(unsigned short _port, unsigned char _data) {
+outb(u16int _port, u8int _data) {
 	ASM("outb %1, %0"
 		::
 		"dN" (_port),
@@ -59,11 +59,11 @@ dump_mem(void *low_mem, size_t length) {
 	char char_map[] = {'0', '1', '2', '3', '4', '5', '6', '7',
 					   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 	char row[81];
-	unsigned char *ptr = (unsigned char *)low_mem;
-	unsigned char *high = low_mem + length - 1;
-	char val;
-	int col = 0;
-	int rcol = 61;
+	u8int *ptr = (u8int *)low_mem;
+	u8int *high = ptr + length - 1;
+	u8int val;
+	u32int col = 0;
+	u32int rcol = 61;
 
 	memset(row, ' ', 81);
 	row[80] = '\0';

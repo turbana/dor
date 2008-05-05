@@ -1,6 +1,8 @@
 #ifndef __SCREEN_H
 #define __SCREEN_H
 
+#include "types.h"
+
 /* standard colors */
 /* to get bright colors or with COLOR_BRIGHT */
 #define COLOR_BLACK		0
@@ -19,9 +21,9 @@
 void scr_scroll(void);
 void scr_update_csr(void);
 void scr_clear(void);
-void scr_putch(char value);
-void scr_puts(char *text);
-void scr_set_color(unsigned char foreground, unsigned char background);
+void scr_putch(const char value);
+void scr_puts(const char *text);
+void scr_set_color(u8int foreground, u8int background);
 void screen_init(void);
 void scr_putp32(void *ptr);
 

@@ -1,8 +1,7 @@
 #include "gdt.h"
 
 void
-gdt_set_gate(int num, unsigned long base, unsigned long limit,
-			 unsigned char access, unsigned char gran) {
+gdt_set_gate(u32int num, u32int base, u32int limit, u8int access, u8int gran) {
 	/* setup base address */
 	gdt[num].base_low = (base & 0xFFFF);
 	gdt[num].base_middle = (base >> 16) & 0xFF;
@@ -21,7 +20,7 @@ void
 gdt_init() {
 	/* setup GDT pointer */
 	gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
-	gp.base = (unsigned int)&gdt;
+	gp.base = (u32int)&gdt;
 
 	/* NULL descriptor */
 	gdt_set_gate(0, 0, 0, 0, 0);

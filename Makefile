@@ -26,9 +26,11 @@ CLEAN := $(OBJS) $(DEPS) kernel.bin fdimage.img core* $(BDIR)
 
 CFLAGS  := -Wall -Werror -O -g -fstrength-reduce -fomit-frame-pointer \
 		   -finline-functions -nostdinc -fno-builtin -fno-stack-protector \
+		   -pedantic -pedantic-errors -Wextra \
+		   -Wno-variadic-macros \
+		   -Wno-long-long \
 		   -I./$(IDIR)
 LDFLAGS := 
-#--pic-executable
 ASFLAGS := -f elf -g
 QFLAGS  := -m 32 -no-kqemu
 

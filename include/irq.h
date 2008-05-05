@@ -1,6 +1,9 @@
 #ifndef __IRQ_H
 #define __IRQ_H
+
 #include "isrs.h"
+
+typedef void (*irq_func_t)(struct regs *);
 
 extern void irq0();
 extern void irq1();
@@ -19,8 +22,8 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
-void irq_install_handler(int, void(*)(struct regs *));
-void irq_uninstall_handler(int);
+void irq_install_handler(u32int, irq_func_t);
+void irq_uninstall_handler(u32int);
 void irq_remap();
 void irq_init();
 void irq_handler(struct regs *);

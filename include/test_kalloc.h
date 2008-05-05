@@ -1,6 +1,8 @@
 #ifndef __TEST_KALLOC_H
 #define __TEST_KALLOC_H
 
+#include "types.h"
+
 #define FAIL(message) \
 	scr_set_color(COLOR_RED | COLOR_BRIGHT, COLOR_BLACK); \
 	scr_puts("\rFAIL\n"); \
@@ -15,6 +17,6 @@
 	scr_puts("\rPASS\n"); \
 	return 1;
 
-int test_kalloc_suite();
+u32int test_kalloc_suite();
 
 #endif

@@ -3,11 +3,11 @@
 #include "irq.h"
 #include "screen.h"
 
-long timer_ticks = 0;
+u32int timer_ticks = 0;
 
 void
-timer_phase(unsigned int hz) {
-	int divisor = 1193180 / hz;		/* calculate divisor */
+timer_phase(u32int hz) {
+	u32int divisor = 1193180 / hz;		/* calculate divisor */
 	outb(0x43, 0x36);				/* send command of 0x36 */
 	outb(0x40, divisor & 0xFF);		/* send low byte of divisor */
 	outb(0x40, divisor >> 8);		/* send high byte of divisor */
@@ -16,8 +16,9 @@ timer_phase(unsigned int hz) {
 void
 timer_handler(struct regs *registers) {
 	timer_ticks++;
+	registers = 0;
 #ifdef TICK_REMINDER
-	static unsigned char color = COLOR_BLACK;
+	static u8int color = COLOR_BLACK;
 
 	if(timer_ticks % 100 == 0) {
 		color = (color + 1) % 8;

@@ -3,7 +3,7 @@
 #include "screen.h"
 #include "sys.h"
 
-int
+u32int
 test_kalloc_same_alloc() {
 	void *loc1, *loc2;
 
@@ -21,11 +21,11 @@ test_kalloc_same_alloc() {
 	PASS();
 }
 
-int
+u32int
 test_kalloc_merge() {
 	void *locations[64];
 	void *loc1, *loc2;
-	int i;
+	u32int i;
 
 	/* make lots of small allocs */
 	for(i = 0; i < 64; i++) {
@@ -62,7 +62,7 @@ test_kalloc_merge() {
 	}
 
 	/* last small alloc should be contiguous with larger alloc */
-	if(loc2 != loc1 + 16 * 65) { /* 65 to account for kalloc bookkeeping */
+	if((u8int *)loc2 != (u8int *)loc1 + 16 * 65) { /* 65 to account for kalloc bookkeeping */
 		kfree(loc1);
 		kfree(loc2);
 		FAIL("last small alloc does not come directly after first alloc");
@@ -72,7 +72,7 @@ test_kalloc_merge() {
 	PASS();
 }
 
-int
+u32int
 test_kalloc_large_alloc() {
 	void *ptr = kalloc(0xF0000000);
 	if(ptr != (void *)0) {
@@ -81,8 +81,8 @@ test_kalloc_large_alloc() {
 	PASS();
 }
 
-int
-run_test(char *name, int (*test)(void)) {
+u32int
+run_test(const char *name, u32int (*test)(void)) {
 	scr_set_color(COLOR_GREY, COLOR_BLACK);
 	scr_puts("     | ");
 	scr_puts(name);
@@ -90,13 +90,13 @@ run_test(char *name, int (*test)(void)) {
 	return test();
 }
 
-int
+u32int
 test_kalloc_suite() {
 	char *names[] = {"same alloc", "stress merge", "large alloc"};
-	int (*funcs[])(void) = {test_kalloc_same_alloc, test_kalloc_merge,
-							test_kalloc_large_alloc};
-	int num_tests = 3;
-	int i;
+	u32int (*funcs[])(void) = {test_kalloc_same_alloc, test_kalloc_merge,
+							   test_kalloc_large_alloc};
+	u32int num_tests = 3;
+	u32int i;
 
 	scr_puts("Test suite for kalloc:\n");
 	for(i = 0; i < num_tests; i++) {

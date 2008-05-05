@@ -1,6 +1,8 @@
 #ifndef __PAGING_H
 #define __PAGING_H
 
+#include "types.h"
+
 /*
  * The following diagrams was taken from ``Intel(c) 64 and IA-32 Architectures
  * Software Developer's Manual Volume 3A: System Programming Guide, Part 1''.
@@ -49,8 +51,8 @@
  */
 
 struct page_entry {
-	unsigned int base_address;
-	unsigned char flags;
+	u32int base_address;
+	u8int  flags;
 } __attribute__((packed));
 
 /* The following represent the possible values that a page directory or a page
@@ -65,9 +67,9 @@ struct page_entry {
 #define PAGE_RW			0x02
 #define PAGE_PRESENT	0x01
 
-#define VIRT_TO_PHYS(loc) ((void *)loc + 0x40000000)
+#define VIRT_TO_PHYS(loc) ((u8int *)loc + 0x40000000)
 
-void write_page_entry(unsigned int *, struct page_entry *);
+void write_page_entry(u32int *, struct page_entry *);
 void paging_init();
 
 #endif

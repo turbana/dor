@@ -1,7 +1,7 @@
 #include "kalloc.h"
 
 struct memnode {
-	char message[4];
+	u8int  message[4];
 	size_t size;
 	struct memnode *next;
 	struct memnode *prev;
@@ -15,8 +15,8 @@ struct memnode *used_list;
 void *
 kalloc(size_t size) {
 	struct memnode *cur, *used, new;
-	unsigned char *loc;
-	void *addr = (void *)0;
+	u8int *loc;
+	u8int *addr = 0;
 
 	/* find the first node that will fit the alloc */
 	for(cur = free_list->next; cur != free_list; cur = cur->next) {
@@ -34,7 +34,7 @@ kalloc(size_t size) {
 		new.size = cur->size - (size + sizeof(struct memnode));
 
 		/* where is it going in memory? */
-		loc = (unsigned char *)cur + size + sizeof(struct memnode);
+		loc = (u8int *)cur + size + sizeof(struct memnode);
 
 		/* insert it into the free list */
 		new.prev = cur->prev;
@@ -50,7 +50,7 @@ kalloc(size_t size) {
 		cur->size = size;
 
 		/* return the current location */
-		addr = (void *)cur + sizeof(struct memnode);
+		addr = (u8int *)cur + sizeof(struct memnode);
 
 		/* add used node to used list, sorted by memory address */
 
@@ -73,9 +73,9 @@ kalloc(size_t size) {
 void
 kfree(void *ptr) {
 	struct memnode *cur, *free;
-	int ssize = sizeof(struct memnode);
+	u32int ssize = sizeof(struct memnode);
 #ifdef KALLOC_CLEAR
-	void *loc;
+	u8int *loc;
 #endif
 
 	/* if ptr is NULL: noop */
@@ -83,7 +83,7 @@ kfree(void *ptr) {
 
 	/* search for ptr in used list */
 	cur = used_list->next;
-	while((void *)cur + ssize != ptr && cur != used_list) {
+	while((u8int *)cur + ssize != ptr && cur != used_list) {
 		cur = cur->next;
 	}
 
@@ -108,18 +108,18 @@ kfree(void *ptr) {
 	cur->next = free;
 
 #ifdef KALLOC_CLEAR
-	memset((void *)cur + ssize, 0, cur->size);
+	memset((u8int *)cur + ssize, 0, cur->size);
 #endif
 
 	/* we can merge left if the previous pointer is not the free list and
 	 * the previous pointer plus it's size is the current pointer */
 	while(cur->prev != free_list &&
-			(void *)(cur->prev) + cur->prev->size + ssize == cur) {
+			(u8int *)(cur->prev) + cur->prev->size + ssize == (u8int *)cur) {
 		cur->prev->next = cur->next;
 		cur->next->prev = cur->prev;
 		cur->prev->size += ssize + cur->size;
 #ifdef KALLOC_CLEAR
-		loc = (void *)cur->prev;
+		loc = (u8int *)cur->prev;
 		memset(cur, 0, ssize);
 		cur = (struct memnode *)loc;
 #else
@@ -130,9 +130,9 @@ kfree(void *ptr) {
 	/* we can merge right if the next pointer is not the free list and
 	 * the current pointer plus it's size is the next pointer */
 	while(cur->next != free_list &&
-			(void *)cur + cur->size + ssize == cur->next) {
+			(u8int *)cur + cur->size + ssize == (u8int *)(cur->next)) {
 #ifdef KALLOC_CLEAR
-		loc = (void *)(cur->next);
+		loc = (u8int *)(cur->next);
 #endif
 		cur->size += cur->next->size + ssize;
 		cur->next->next->prev = cur;

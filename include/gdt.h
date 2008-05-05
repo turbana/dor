@@ -1,6 +1,8 @@
 #ifndef __GDT_H
 #define __GDT_H
 
+#include "types.h"
+
 /*
  * Global Descriptor Table
  * =======================
@@ -87,17 +89,17 @@
  */
 
 struct gdt_entry {
-	unsigned short limit_low;
-	unsigned short base_low;
-	unsigned char base_middle;
-	unsigned char access;
-	unsigned char granularity;
-	unsigned char base_high;
+	u16int	limit_low;
+	u16int	base_low;
+	u8int	base_middle;
+	u8int	access;
+	u8int	granularity;
+	u8int	base_high;
 } __attribute__((packed));		/* ensure GCC doesn't optimize this struct */
 
 struct gdt_ptr {
-	unsigned short limit;
-	unsigned int base;
+	u16int limit;
+	u32int base;
 } __attribute__((packed));
 
 struct gdt_entry gdt[3];
@@ -105,8 +107,8 @@ struct gdt_ptr gp;
 
 extern void gdt_flush();		/* defined in boot.asm */
 
-void gdt_set_gate(int, unsigned long, unsigned long, unsigned char,
-				  unsigned char);
+void gdt_set_gate(u32int num, u32int base, u32int limit, u8int access,
+				  u8int gran);
 void gdt_init();
 
 #endif

@@ -3,14 +3,14 @@
 
 /* VGA tutorial: http://www.brackeen.com/home/vga */
 
-static unsigned short *vidmem;		/* location of video memory */
-static int attributes = 0x0700;		/* default to grey on black */
-static int crs_y = 0;				/* cursor starts in top-left */
-static int crs_x = 0;
+static u16int *vidmem;		/* location of video memory */
+static u32int attributes = 0x0700;		/* default to grey on black */
+static u32int crs_y = 0;				/* cursor starts in top-left */
+static u32int crs_x = 0;
 
 void
 scr_scroll(void) {
-	unsigned short blank, temp;
+	u16int blank, temp;
 
 	/* we only need to scroll when the cursor has gone off the screen */
 	if(crs_y >= 25) {
@@ -30,7 +30,7 @@ scr_scroll(void) {
 
 void
 scr_update_csr(void) {
-	unsigned short location;
+	u16int location;
 
 	location = crs_y * 80 + crs_x;
 
@@ -43,7 +43,7 @@ scr_update_csr(void) {
 
 void
 scr_clear(void) {
-	unsigned short blank;
+	u16int blank;
 	int row;
 
 	blank = 0x20 | (COLOR_BLACK<<8) | COLOR_GREY;
@@ -57,8 +57,8 @@ scr_clear(void) {
 }
 
 void
-scr_putch(char value) {
-	unsigned short *ptr;
+scr_putch(const char value) {
+	u16int *ptr;
 	
 	if(value == 0x08) {			/* backspace */
 		if(crs_x != 0) {
@@ -88,8 +88,8 @@ scr_putch(char value) {
 }
 
 void
-scr_puts(char *string) {
-	char *ptr = string;
+scr_puts(const char *string) {
+	char *ptr = (char *)string;
 	while(*ptr != '\0') {
 		scr_putch(*ptr++);
 	}
@@ -99,31 +99,31 @@ void
 scr_putp32(void *ptr) {
 	char char_map[] = {'0', '1', '2', '3', '4', '5', '6', '7',
 					   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-	unsigned int mem = (unsigned int)ptr;
+	u32int mem = (u32int)ptr;
 	char row[9];
-	int col = 0;
+	u32int col = 0;
 
 	row[8] = '\0';
 
-	row[col++] = char_map[((unsigned int)mem >> 28) & 0xF];
-	row[col++] = char_map[((unsigned int)mem >> 24) & 0xF];
-	row[col++] = char_map[((unsigned int)mem >> 20) & 0xF];
-	row[col++] = char_map[((unsigned int)mem >> 16) & 0xF];
-	row[col++] = char_map[((unsigned int)mem >> 12) & 0xF];
-	row[col++] = char_map[((unsigned int)mem >> 8) & 0xF];
-	row[col++] = char_map[((unsigned int)mem >> 4) & 0xF];
-	row[col++] = char_map[(unsigned int)mem & 0xF];
+	row[col++] = char_map[((u32int)mem >> 28) & 0xF];
+	row[col++] = char_map[((u32int)mem >> 24) & 0xF];
+	row[col++] = char_map[((u32int)mem >> 20) & 0xF];
+	row[col++] = char_map[((u32int)mem >> 16) & 0xF];
+	row[col++] = char_map[((u32int)mem >> 12) & 0xF];
+	row[col++] = char_map[((u32int)mem >> 8) & 0xF];
+	row[col++] = char_map[((u32int)mem >> 4) & 0xF];
+	row[col++] = char_map[(u32int)mem & 0xF];
 
 	scr_puts(row);
 }
 
 void
-scr_set_color(unsigned char foreground, unsigned char background) {
+scr_set_color(u8int foreground, u8int background) {
 	attributes = ((background << 4) | (foreground & 0x0F)) << 8;
 }
 
 void
 screen_init(void) {
-	vidmem = (unsigned short *)VID_MEM;
+	vidmem = (u16int *)VID_MEM;
 	scr_clear();
 }

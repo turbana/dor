@@ -18,7 +18,10 @@ unsigned char kbdus[128] = {
 
 void
 keyboard_handler(struct regs *registers) {
-	unsigned char scancode;
+	u8int scancode;
+
+	/* we don't really use registers and gcc complains */
+	registers = 0;
 
 	/* read from keyboard */
 	scancode = inb(0x60);

@@ -7,19 +7,19 @@ void *
 memcpy(void *source, const void *dest, size_t count);
 
 void *
-memset(void *dest, char value, size_t count);
+memset(void *dest, u8int value, size_t count);
 
-unsigned short *
-memsetw(unsigned short *dest, unsigned short value, size_t count);
+u16int *
+memsetw(u16int *dest, u16int value, size_t count);
 
 size_t
-strlen(const char *string);
+strlen(const u8int *string);
 
-unsigned char
-inb(unsigned short _port);
+u8int
+inb(u16int _port);
 
 void
-outb(unsigned short _port, unsigned char _data);
+outb(u16int _port, u8int _data);
 
 void
 dump_mem(void *low_mem, size_t length);

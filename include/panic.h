@@ -8,7 +8,7 @@
 #define __STRING(x) __ESCAPE(x)
 #define __LOCATION  __FILE__ ":" __STRING(__LINE__) " "
 
-void panic(char *message);
+void panic(const char *message);
 #define PANIC(msg) panic(__LOCATION msg)
 
 #endif
