@@ -1,0 +1,77 @@
+
+Inter Process Communication
+===========================
+
+
+[SENDER]
+	message_t message;
+	unsigned int dest, flag1, flag2, flag3, flag4;
+	unsigned short listen_port;
+	void *page;
+	char *data = "Some really long message";
+
+	/* request a special page of memory to be used solely for IPC */
+	page = ipc_data_load();
+
+	/* copy our data into that page */
+	memcpy(page, data, strlen(data));
+
+	/* make a kernel request to find the address and port of the server we are
+	 * trying to send to. we want the main port since we are not specifying a
+	 * port in the connection string.
+	 */
+	dest = ipc_lookup("/sys/someserver");
+
+	/* set up the flags (based on the protocol the server uses) */
+	flag1 = strlen(data);
+	flag2 = flag3 = flag4 = 0;
+
+	/* build the message struct */
+	message.data = page;
+	message.address = dest;
+	message.flag1 = flag1;
+	message.flag2 = flag2;
+	message.flag3 = flag3;
+	message.flag4 = flag4;
+
+	/* send the message (asynchronously) and get a local listening port back */
+	listen_port = ipc_send(&message);
+
+	/* wait for the response (synchronously) */
+	ipc_receive(&message, listen_port);
+
+	/* or we could use the synchronous send (NOTE this only works if the server
+	 * will respond to our request */
+	//ipc_send_sync(&message);
+
+	/* check for any errors */
+	if(message.flag1 != 0) {
+		error();
+	} else if(message.flag2 < strlen(data)) {
+		send_more_data();
+	}
+
+
+[RECEIVER]
+	message_t message;
+	unsigned int sender;
+
+	/* wait for a request (synchronously) on any of our ports */
+	sender = ipc_receive(&message, 0);
+
+	/* handle that request */
+	handle_request(message.data, message.flag1);
+
+	/* if we need we can move the IPC page into our own heap */
+	//void *data = ipc_data_heap(message.data);
+	//message.data = NULL;
+
+	/* setup response (using the same message we received) */
+	ipc_data_unload(message.data); /* unmap the data as we're not sending any */
+	message.data = NULL;
+	message.flag1 = 0;
+	message.flag2 = strlen(message.data);
+	message.address = sender;
+
+	/* send back response (asyncronously) */
+	ipc_send(&message);
