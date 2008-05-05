@@ -1,6 +1,7 @@
 #include "idt.h"
 #include "isrs.h"
 #include "screen.h"
+#include "asm.h"
 
 /* exception error messages */
 char *exception_messages[] = {
@@ -86,6 +87,7 @@ fault_handler(struct regs *registers) {
 	if(registers->int_no < 32) {
 		scr_puts(exception_messages[registers->int_no]);
 		scr_puts(" Exception. Halting System!\n");
-		__asm__ __volatile__ ("hlt" ::);
+		ASM("cli\n\t"
+			"hlt");
 	}
 }

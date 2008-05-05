@@ -9,6 +9,7 @@
 #include "keyboard.h"
 #include "kalloc.h"
 #include "paging.h"
+#include "asm.h"
 
 #include "test_kalloc.h"
 
@@ -25,7 +26,7 @@ k_entry(void) {
 
 	keyboard_init();
 
-	__asm__ __volatile__ ("sti");
+	ASM("sti");
 
 	scr_puts("Hello Ian.\n");
 

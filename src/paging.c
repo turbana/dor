@@ -1,4 +1,5 @@
 #include "paging.h"
+#include "asm.h"
 
 /* Setup a page table mapping the first 4mb of physical memory, then setup the
  * kernel's page directory with the first index and the index of high memory
@@ -42,11 +43,11 @@ paging_init() {
 	 * enabled when we use the pointer. */
 	void *page_dir_ptr = VIRT_TO_PHYS(kernel_pd);
 
-	__asm__ __volatile__ ("mov %0, %%eax\n\t"
-						  "mov %%eax, %%cr3\n\t"		/* use kernel's PD */
-						  "mov %%cr0, %%eax\n\t"
-						  "orl $0x80000000, %%eax\n\t"
-						  "mov %%eax, %%cr0\n\t"		/* now turn it on! */
-						  ::
-						  "m" (page_dir_ptr));
+	ASM("mov %0, %%eax\n\t"
+		"mov %%eax, %%cr3\n\t"		/* use kernel's PD */
+		"mov %%cr0, %%eax\n\t"
+		"orl $0x80000000, %%eax\n\t"
+		"mov %%eax, %%cr0\n\t"		/* now turn it on! */
+		::
+		"m" (page_dir_ptr));
 }

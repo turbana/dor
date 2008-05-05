@@ -1,5 +1,6 @@
 #include "sys.h"
 #include "screen.h"
+#include "asm.h"
 
 void *
 memcpy(void *dest, const void *source, size_t count) {
@@ -33,13 +34,18 @@ strlen(const char *string) {
 unsigned char
 inb(unsigned short _port) {
 	unsigned char ret;
-	__asm__ __volatile__ ("inb %1, %0" : "=a" (ret) : "dN" (_port));
+	ASM("inb %1, %0"
+		: "=a" (ret)
+		: "dN" (_port));
 	return ret;
 }
 
 void
 outb(unsigned short _port, unsigned char _data) {
-	__asm__ __volatile__ ("outb %1, %0" : : "dN" (_port), "a" (_data));
+	ASM("outb %1, %0"
+		::
+		"dN" (_port),
+		"a"  (_data));
 }
 
 /* Memory Dump Ruler:
