@@ -87,7 +87,81 @@ fault_handler(struct regs *registers) {
 	if(registers->int_no < 32) {
 		scr_puts(exception_messages[registers->int_no]);
 		scr_puts(" Exception. Halting System!\n");
+		register_dump(registers);
 		ASM("cli\n\t"
 			"hlt");
 	}
+}
+
+void
+register_dump(struct regs *registers) {
+	/* row one */
+	scr_puts("EAX=");
+	scr_putp32((u32int *)registers->eax);
+
+	scr_puts(" EBX=");
+	scr_putp32((u32int *)registers->ebx);
+
+	scr_puts(" ECX=");
+	scr_putp32((u32int *)registers->ecx);
+
+	scr_puts(" EDX=");
+	scr_putp32((u32int *)registers->edx);
+	scr_putch('\n');
+
+	/* row two */
+	scr_puts("ESI=");
+	scr_putp32((u32int *)registers->esi);
+
+	scr_puts(" EDI=");
+	scr_putp32((u32int *)registers->edi);
+
+	scr_puts(" EBP=");
+	scr_putp32((u32int *)registers->ebp);
+
+	scr_puts(" ESP=");
+	scr_putp32((u32int *)registers->esp);
+	scr_putch('\n');
+
+	/* row three */
+	scr_puts("EIP=");
+	scr_putp32((u32int *)registers->eip);
+	scr_putch('\n');
+
+	/* segment registers */
+	scr_puts("CS =");
+	scr_putp32((u32int *)registers->cs);
+
+	scr_puts("\nDS =");
+	scr_putp32((u32int *)registers->ds);
+
+	scr_puts("\nSS =");
+	scr_putp32((u32int *)registers->ss);
+
+	scr_puts("\nES =");
+	scr_putp32((u32int *)registers->es);
+
+	scr_puts("\nGS =");
+	scr_putp32((u32int *)registers->gs);
+
+	scr_puts("\nFS =");
+	scr_putp32((u32int *)registers->fs);
+	scr_putch('\n');
+
+	/* others */
+	scr_puts("INT=");
+	scr_putp32((u32int *)registers->int_no);
+	scr_putch('\n');
+
+	scr_puts("ERR=");
+	scr_putp32((u32int *)registers->err_code);
+	scr_putch('\n');
+
+	scr_puts("EFLAGS=");
+	scr_putp32((u32int *)registers->eflags);
+	scr_putch('\n');
+
+	scr_puts("USER_ESP=");
+	scr_putp32((u32int *)registers->useresp);
+	scr_putch('\n');
 }
