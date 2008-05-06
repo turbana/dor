@@ -46,5 +46,6 @@ struct regs {
 
 void isrs_init();
 void fault_handler(struct regs *);
+void register_dump(struct regs *);
 
 #endif
