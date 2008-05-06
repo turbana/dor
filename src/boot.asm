@@ -69,7 +69,7 @@ entry:				; execution starts in low memory
 ;;; TASK SAVE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-extern __task_save
+global __task_save
 __task_save:
 	push ebx		; save EBX
 
@@ -102,6 +102,29 @@ __task_save:
 
 ;;; TASK LOAD
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+global __task_load
+__task_load:
+	mov eax, [esp + 8]	; EAX = &task
+	mov ebx, [eax + 12]	; EBX = task->esp
+
+	mov ecx, 1
+	mov [eax + 28], ecx	; task->eax holds return value of 1
+
+	mov ecx, [eax + 36]	; load EFLAGS
+	mov [ebx -  4], ecx
+	mov [ebx -  8], cs	; load current code segment
+	mov ecx, [eax + 4]	; load EIP
+	mov [ebx - 12], ecx
+
+	sub ebx, 12
+	mov [eax + 8], ebx	; save task's stack
+
+	mov esp, ebx		; move the task's stack to our stack
+	popa			; pop registers
+	mov esp, [esp - 20]
+	iret
+
 
 
 ;;; GDT SETUP

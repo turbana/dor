@@ -10,11 +10,13 @@
 #include "kalloc.h"
 #include "paging.h"
 #include "asm.h"
+#include "scheduler.h"
 
 #include "test_kalloc.h"
 
 void
 k_entry(void) {
+/*int i,j;*/
 	paging_init();
 	gdt_init();
 	idt_init();
@@ -23,6 +25,7 @@ k_entry(void) {
 	screen_init();
 	kalloc_init();
 	timer_init();
+	scheduler_init();
 
 	keyboard_init();
 
@@ -31,6 +34,13 @@ k_entry(void) {
 	scr_puts("Hello Ian.\n");
 
 	test_kalloc_suite();
+
+/*i = 0;
+j = 1/i;
+scr_putch(j);*/
+
+
+	schedule();
 
 	for(;;);		/* spin baby, spin */
 }
