@@ -66,6 +66,44 @@ entry:				; execution starts in low memory
 	hlt
 
 
+;;; TASK SAVE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+extern __task_save
+__task_save:
+	push ebx		; save EBX
+
+	mov ebx, [esp + 8]	; EBX = &task
+
+	mov [ebx +  0], edi	; save EDI
+	mov [ebx +  4], esi	; save ESI
+	mov [ebx +  8], ebp	; save EBP
+
+	mov [ebx + 20], edx	; save EDX
+	mov [ebx + 24], ecx	; save ECX
+	mov [ebx + 28], eax	; save EAX
+
+	mov eax, [esp]		; get pushed EBX
+	mov [ebx + 16], eax	; save EBX
+
+	lea eax, [esp + 8]	; load real ESP
+	mov [ebx + 12], eax	; save ESP
+
+	mov eax, [esp + 4]	; load real EIP
+	mov [ebx + 32], eax	; save EIP
+	
+	pushf			; push EFLAGS
+	pop dword [ebx + 36]	; save EFLAGS
+
+	pop ebx
+	xor eax, eax
+	ret
+
+
+;;; TASK LOAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 ;;; GDT SETUP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
