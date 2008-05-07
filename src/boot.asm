@@ -422,11 +422,29 @@ global irq13
 global irq14
 global irq15
 
-irq0:
-	cli			; disable interrupts
-	push byte 0		; no error code
-	push byte 32		; interrupts will start at 32
-	jmp irq_common
+extern task_switch
+irq0:				; task switching
+	cli			; stop interrupts
+	pusha			; store register information
+	push ds			; store segments
+	push es
+	push fs
+	push gs
+
+	push esp		; pass current esp to task_switch()
+	call task_switch
+	mov esp, eax		; set esp to result of task_switch()
+
+	pop gs			; restore segments
+	pop fs
+	pop es
+	pop ds
+
+	mov al, 0x20		; acknowladge IRQ
+	out 0x20, al
+
+	popa			; restore registers
+	iret			; re-enable interrupts and return
 
 irq1:
 	cli

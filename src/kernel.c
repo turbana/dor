@@ -13,10 +13,10 @@
 #include "scheduler.h"
 
 #include "test_kalloc.h"
+#include "test_tasks.h"
 
 void
 k_entry(void) {
-/*int i,j;*/
 	paging_init();
 	gdt_init();
 	idt_init();
@@ -26,21 +26,18 @@ k_entry(void) {
 	kalloc_init();
 	timer_init();
 	scheduler_init();
-
 	keyboard_init();
-
-	ASM("sti");
 
 	scr_puts("Hello Ian.\n");
 
 	test_kalloc_suite();
 
-/*i = 0;
-j = 1/i;
-scr_putch(j);*/
+	/* setup some test tasks */
+	task_create(task1);
+	task_create(task2);
+	task_create(task3);
+	task_create(task4);
 
-
-	schedule();
-
-	for(;;);		/* spin baby, spin */
+	/* enable interrupts and start scheduling tasks */
+	scheduler_start();	/* never exits */
 }

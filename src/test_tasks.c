@@ -3,8 +3,7 @@
 #include "screen.h"
 
 void pause() {
-	int i;
-	for(i=0; i<50000; i++);
+	ASM("hlt");
 }
 
 void task1() {

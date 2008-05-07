@@ -5,9 +5,11 @@
 #include "tasks.h"
 
 #define TASK_STACK_SIZE 512
-#define TASK_MAX_COUNT 5
+#define TASK_MAX_COUNT 32
 
-void schedule();
 void scheduler_init();
+void scheduler_start();
+void task_create(void (*task)());
+u32int task_switch(u32int last_esp);
 
 #endif

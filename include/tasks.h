@@ -13,7 +13,8 @@ struct task {
 	enum {
 		TS_RUNNING,
 		TS_READY,
-		TS_BLOCKED
+		TS_BLOCKED,
+		TS_KILLED
 	} status;
 };
 
