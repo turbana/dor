@@ -29,8 +29,9 @@ CFLAGS  := -Wall -Werror -O -g -fstrength-reduce -fomit-frame-pointer \
 		   -pedantic -pedantic-errors -Wextra \
 		   -Wno-variadic-macros \
 		   -Wno-long-long \
+		   -Wa,--fatal-warnings \
 		   -I./$(IDIR)
-LDFLAGS := 
+LDFLAGS := --fatal-warnings
 ASFLAGS := -f elf -g
 QFLAGS  := -m 32 -no-kqemu
 
