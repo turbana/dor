@@ -66,6 +66,67 @@ entry:				; execution starts in low memory
 	hlt
 
 
+;;; TASK SAVE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+global __task_save
+__task_save:
+	push ebx		; save EBX
+
+	mov ebx, [esp + 8]	; EBX = &task
+
+	mov [ebx +  0], edi	; save EDI
+	mov [ebx +  4], esi	; save ESI
+	mov [ebx +  8], ebp	; save EBP
+
+	mov [ebx + 20], edx	; save EDX
+	mov [ebx + 24], ecx	; save ECX
+	mov [ebx + 28], eax	; save EAX
+
+	mov eax, [esp]		; get pushed EBX
+	mov [ebx + 16], eax	; save EBX
+
+	lea eax, [esp + 8]	; load real ESP
+	mov [ebx + 12], eax	; save ESP
+
+	mov eax, [esp + 4]	; load real EIP
+	mov [ebx + 32], eax	; save EIP
+	
+	pushf			; push EFLAGS
+	pop dword [ebx + 36]	; save EFLAGS
+
+	pop ebx
+	xor eax, eax
+	ret
+
+
+;;; TASK LOAD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+global __task_load
+__task_load:
+	mov eax, [esp + 8]	; EAX = &task
+	mov ebx, [eax + 12]	; EBX = task->esp
+
+	mov ecx, 1
+	mov [eax + 28], ecx	; task->eax holds return value of 1
+
+	mov ecx, [eax + 36]	; load EFLAGS
+	mov [ebx -  4], ecx
+	mov [ebx -  8], cs	; load current code segment
+	mov ecx, [eax + 4]	; load EIP
+	mov [ebx - 12], ecx
+
+	sub ebx, 12
+	mov [eax + 8], ebx	; save task's stack
+
+	mov esp, ebx		; move the task's stack to our stack
+	popa			; pop registers
+	mov esp, [esp - 20]
+	iret
+
+
+
 ;;; GDT SETUP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -361,11 +422,29 @@ global irq13
 global irq14
 global irq15
 
-irq0:
-	cli			; disable interrupts
-	push byte 0		; no error code
-	push byte 32		; interrupts will start at 32
-	jmp irq_common
+extern task_switch
+irq0:				; task switching
+	cli			; stop interrupts
+	pusha			; store register information
+	push ds			; store segments
+	push es
+	push fs
+	push gs
+
+	push esp		; pass current esp to task_switch()
+	call task_switch
+	mov esp, eax		; set esp to result of task_switch()
+
+	pop gs			; restore segments
+	pop fs
+	pop es
+	pop ds
+
+	mov al, 0x20		; acknowladge IRQ
+	out 0x20, al
+
+	popa			; restore registers
+	iret			; re-enable interrupts and return
 
 irq1:
 	cli

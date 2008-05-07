@@ -92,6 +92,7 @@ run_test(const char *name, u32int (*test)(void)) {
 
 u32int
 test_kalloc_suite() {
+	u32int ret_val = 1;
 	char *names[] = {"same alloc", "stress merge", "large alloc"};
 	u32int (*funcs[])(void) = {test_kalloc_same_alloc, test_kalloc_merge,
 							   test_kalloc_large_alloc};
@@ -100,7 +101,11 @@ test_kalloc_suite() {
 
 	scr_puts("Test suite for kalloc:\n");
 	for(i = 0; i < num_tests; i++) {
-		if(!run_test(names[i], funcs[i])) return 0;
+		if(!run_test(names[i], funcs[i])) {
+			ret_val = 0;
+			break;
+		}
 	}
-	return 1;
+	scr_set_color(COLOR_GREY, COLOR_BLACK);
+	return ret_val;
 }

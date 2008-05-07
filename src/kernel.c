@@ -10,8 +10,10 @@
 #include "kalloc.h"
 #include "paging.h"
 #include "asm.h"
+#include "scheduler.h"
 
 #include "test_kalloc.h"
+#include "test_tasks.h"
 
 void
 k_entry(void) {
@@ -23,14 +25,19 @@ k_entry(void) {
 	screen_init();
 	kalloc_init();
 	timer_init();
-
+	scheduler_init();
 	keyboard_init();
-
-	ASM("sti");
 
 	scr_puts("Hello Ian.\n");
 
 	test_kalloc_suite();
 
-	for(;;);		/* spin baby, spin */
+	/* setup some test tasks */
+	task_create(task1);
+	task_create(task2);
+	task_create(task3);
+	task_create(task4);
+
+	/* enable interrupts and start scheduling tasks */
+	scheduler_start();	/* never exits */
 }

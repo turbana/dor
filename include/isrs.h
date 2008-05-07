@@ -37,12 +37,12 @@ extern void isr31();
 
 /* stack frame struct */
 struct regs {
-	unsigned int gs, fs, es, ds;		/* segments */
 	unsigned int edi, esi, ebp, esp;	/* stack pointers */
 	unsigned int ebx, edx, ecx, eax;	/* registers */
+	unsigned int gs, fs, es, ds;		/* segments */
 	unsigned int int_no, err_code;		/* interrupt number and error code */
 	unsigned int eip, cs, eflags, useresp, ss; /* processor flags */
-};
+} __attribute__((packed));
 
 void isrs_init();
 void fault_handler(struct regs *);
