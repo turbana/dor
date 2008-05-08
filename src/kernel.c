@@ -11,6 +11,7 @@
 #include "paging.h"
 #include "asm.h"
 #include "scheduler.h"
+#include "mm.h"
 
 #include "test_kalloc.h"
 #include "test_tasks.h"
@@ -19,11 +20,12 @@ void
 k_entry(void) {
 	paging_init();
 	gdt_init();
+	kalloc_init();
+	mm_init(32 * 1024 * 1024);
 	idt_init();
 	isrs_init();
 	irq_init();
 	screen_init();
-	kalloc_init();
 	timer_init();
 	scheduler_init();
 	keyboard_init();
