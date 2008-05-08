@@ -11,8 +11,10 @@ test_kalloc_same_alloc() {
 	if(loc1 == (void *)0) {
 		FAIL("kalloc(128) returned NULL");
 	}
+	*(u32int *)loc1 = 42;
 	kfree(loc1);
 	loc2 = kalloc(128);
+	*(u32int *)loc2 = 42;
 	if(loc1 != loc2) {
 		kfree(loc2);
 		FAIL("kalloc, free, kalloc did not return same address");
@@ -60,6 +62,9 @@ test_kalloc_merge() {
 	if(loc2 == (void *)0) {
 		FAIL("last kalloc(16) returned NULL");
 	}
+
+	*(u32int *)loc1 = 42;
+	*(u32int *)loc2 = 42;
 
 	/* last small alloc should be contiguous with larger alloc */
 	if((u8int *)loc2 != (u8int *)loc1 + 16 * 65) { /* 65 to account for kalloc bookkeeping */
