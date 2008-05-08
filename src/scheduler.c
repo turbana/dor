@@ -5,33 +5,48 @@
 
 struct task all_tasks[TASK_MAX_COUNT];
 u8int task_stacks[TASK_MAX_COUNT][TASK_STACK_SIZE];
-u32int cur_task = 0;
+u32int cur_task = -1;
 
 u32int
 task_switch(u32int last_esp) {
-	struct task *current = all_tasks + cur_task;
 	u32int i = cur_task;
+	u32int found_task = 0;
 
 	/* save current task's esp */
-	current->esp = last_esp;
+	all_tasks[i].esp = last_esp;
 
 	/* if the task finished it's timeslice mark it as ready */
-	if(current->status == TS_RUNNING) {
-		current->status = TS_READY;
+	if(all_tasks[i].status == TS_RUNNING) {
+		all_tasks[i].status = TS_READY;
+	}
+
+	/* if we just ran the idle task pretend we ran task 1 */
+	if(cur_task == 0) {
+		i = 1;
 	}
 
 	/* find the next ready task (round robin) ... */
 	do {
 		i = (i + 1) % TASK_MAX_COUNT;
-		current = &all_tasks[i];
-	} while(current->status != TS_READY);
+		if(i == 0) i = 1;
+
+		if(all_tasks[i].status == TS_READY) {
+			found_task = 1;
+			break;
+		}
+	} while(i != cur_task);
+
+	/* if we didn't find a ready task: run the idle task */
+	if(!found_task) {
+		i = 0;
+	}
 
 	/* ... and set that task to running */
-	current->status = TS_RUNNING;
+	all_tasks[i].status = TS_RUNNING;
 	cur_task = i;
 
 	/* return the new task's esp */
-	return current->esp;
+	return all_tasks[i].esp;
 }
 
 void
