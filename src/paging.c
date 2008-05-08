@@ -1,12 +1,13 @@
 #include "paging.h"
 #include "asm.h"
 
-/* Setup a page table mapping the first 4mb of physical memory, then setup the
- * kernel's page directory with the first index and the index of high memory
- * both pointing to the low memory page table. Make sure that both the page
- * table and page directory are aligned on pages.
+/*
+ * Identity map the first 20mb of physical memory. This is enough for the kernel
+ * binary and heap space. We then map the first 20mb of kernel virtual memory
+ * starting at 0xC0000000, this lets us far jump into the kernel loaded at high
+ * memory.
  */
-static u32int lowmem_pt[1024] __attribute__((aligned (4096)));
+static u32int lowmem_pts[5][1024] __attribute__((aligned (4096)));
 static u32int kernel_pd[1024] __attribute__((aligned (4096)));
 
 void
@@ -16,27 +17,32 @@ write_page_entry(u32int *dest, struct page_entry *entry) {
 
 void
 paging_init() {
-	u32int i;
+	u32int i, j;
 	struct page_entry dir_entry, table_entry;
 	void *page_dir_ptr;
 
 	table_entry.flags = PAGE_CACHED | PAGE_PRESENT | PAGE_RW;
 	dir_entry.flags   = PAGE_CACHED | PAGE_PRESENT | PAGE_RW;
 
-	for(i = 0; i < 1024; i++) {
-		/* load lowmem page table ... */
-		table_entry.base_address = i * 4096;
-		write_page_entry(lowmem_pt + i, &table_entry);
-		/* ... and clear the kernel page directory */
-		kernel_pd[i] = 0;
+	for(j = 0; j < 5; j++) {
+		for(i = 0; i < 1024; i++) {
+			/* load lowmem page tables ... */
+			table_entry.base_address = (j * 1024 * 4096) + (i * 4096);
+			write_page_entry(&lowmem_pts[j][i], &table_entry);
+			/* ... and clear the kernel page directory */
+			kernel_pd[i] = 0;
+		}
 	}
 
 	/* Load the kernel page directory with the low mem page table.
 	 * As paging is not yet enabled we need a physical address for the base
 	 * address. */
-	dir_entry.base_address = (u32int)VIRT_TO_PHYS(lowmem_pt);
-	write_page_entry(kernel_pd + 0, &dir_entry);
-	write_page_entry(kernel_pd + 768, &dir_entry);
+	j = 768;	/* page directory entry for 0xC0000000 */
+	for(i = 0; i < 5; i++) {
+		dir_entry.base_address = (u32int)VIRT_TO_PHYS(&lowmem_pts[i]);
+		write_page_entry(kernel_pd + i, &dir_entry);
+		write_page_entry(kernel_pd + j + i, &dir_entry);
+	}
 
 	/* This is here because we need a pointer to the kernel's page directory,
 	 * but the pointer needs to live on the stack in order to use it in inline

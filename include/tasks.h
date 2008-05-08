@@ -1,15 +1,11 @@
 #ifndef __TASKS_H
 #define __TASKS_H
 
-#include "asm.h"
 #include "types.h"
 
-/* to get struct regs */
-#include "isrs.h"
-
 struct task {
-	struct regs registers;
-	unsigned int pid;
+	u32int esp;
+	u32int pid;
 	enum {
 		TS_RUNNING,
 		TS_READY,
