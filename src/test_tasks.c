@@ -10,6 +10,9 @@ void pause() {
 void task1() {
 	while(1) {
 		scr_putch('1');
+		unblock(3);
+		block(2);
+		block(4);
 		pause();
 	}
 }
@@ -17,6 +20,9 @@ void task1() {
 void task2() {
 	while(1) {
 		scr_putch('2');
+		unblock(4);
+		block(3);
+		block(1);
 		pause();
 	}
 }
@@ -24,6 +30,8 @@ void task2() {
 void task3() {
 	while(1) {
 		scr_putch('3');
+		unblock(2);
+		block(1);
 		pause();
 	}
 }
@@ -31,6 +39,7 @@ void task3() {
 void task4() {
 	while(1) {
 		scr_putch('4');
+		unblock(1);
 		pause();
 	}
 }

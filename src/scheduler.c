@@ -75,6 +75,16 @@ task_create(void (*entry)()) {
 }
 
 void
+block(u32int pid) {
+	all_tasks[pid].status = TS_BLOCKED;
+}
+
+void
+unblock(u32int pid) {
+	all_tasks[pid].status = TS_READY;
+}
+
+void
 _idle_task() {
 	while(1) {
 		scr_putch('.');

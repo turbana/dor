@@ -11,5 +11,7 @@ void scheduler_init();
 void scheduler_start();
 void task_create(void (*task)());
 u32int task_switch(u32int last_esp);
+void block(u32int pid);
+void unblock(u32int pid);
 
 #endif
