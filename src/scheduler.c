@@ -1,6 +1,7 @@
 #include "scheduler.h"
 #include "screen.h"
 #include "panic.h"
+#include "asm.h"
 
 struct task all_tasks[TASK_MAX_COUNT];
 u8int task_stacks[TASK_MAX_COUNT][TASK_STACK_SIZE];
@@ -12,7 +13,7 @@ task_switch(u32int last_esp) {
 	u32int i = cur_task;
 
 	/* save current task's esp */
-	current->registers.esp = last_esp;
+	current->esp = last_esp;
 
 	/* if the task finished it's timeslice mark it as ready */
 	if(current->status == TS_RUNNING) {
@@ -30,7 +31,7 @@ task_switch(u32int last_esp) {
 	cur_task = i;
 
 	/* return the new task's esp */
-	return current->registers.esp;
+	return current->esp;
 }
 
 void
@@ -69,7 +70,7 @@ task_create(void (*entry)()) {
 	*--stack = 0x10;			/* FS */
 	*--stack = 0x10;			/* GS */
 
-	all_tasks[i].registers.esp = (u32int)stack;
+	all_tasks[i].esp = (u32int)stack;
 	all_tasks[i].status = TS_READY;
 }
 

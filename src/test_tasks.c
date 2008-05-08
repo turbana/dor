@@ -1,6 +1,7 @@
 #include "test_tasks.h"
 #include "scheduler.h"
 #include "screen.h"
+#include "asm.h"
 
 void pause() {
 	ASM("hlt");
