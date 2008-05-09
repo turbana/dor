@@ -1,6 +1,7 @@
 #include "sys.h"
 #include "screen.h"
 #include "asm.h"
+#include "panic.h"
 
 void *
 memcpy(void *dest, const void *source, size_t count) {
@@ -115,4 +116,8 @@ dump_mem(void *low_mem, size_t length) {
 	if(col > 0) {
 		scr_puts(row);
 	}
+}
+
+void __stack_chk_fail() {
+	PANIC("__stack_chk_fail: Kernel stack corrupted");
 }
