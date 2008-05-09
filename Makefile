@@ -24,12 +24,9 @@ BOBJS := $(addprefix $(BDIR)/, $(OBJS))
 DEPS  := $(patsubst %.c, %.d, $(SRCS))
 CLEAN := $(OBJS) $(DEPS) kernel.bin fdimage.img core* $(BDIR)
 
-CFLAGS  := -Wall -Werror -O -g -fstrength-reduce -fomit-frame-pointer \
-		   -finline-functions -nostdinc -fno-builtin -fno-stack-protector \
-		   -pedantic -pedantic-errors -Wextra \
-		   -Wno-variadic-macros \
-		   -Wno-long-long \
-		   -Wa,--fatal-warnings \
+CFLAGS  := -Wall -Werror -O -g -fstrength-reduce -finline-functions -nostdinc \
+		   -fno-builtin -pedantic -pedantic-errors -Wextra \
+		   -Wno-variadic-macros -Wno-long-long -Wa,--fatal-warnings \
 		   -I./$(IDIR)
 LDFLAGS := --fatal-warnings
 ASFLAGS := -f elf -g
