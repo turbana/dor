@@ -4,7 +4,7 @@
 #include "types.h"
 
 void *
-memcpy(void *source, const void *dest, size_t count);
+memcpy(void *dest, const void *source, size_t count);
 
 void *
 memset(void *dest, u8int value, size_t count);
