@@ -21,18 +21,22 @@ k_entry(void) {
 	paging_init();
 	gdt_init();
 	kalloc_init();
-	mm_init(32 * 1024 * 1024);
+	screen_init();
+
+	if(!test_kalloc_suite()) {
+		ASM("cli\n\t"
+			"hlt");
+	}
+
 	idt_init();
 	isrs_init();
 	irq_init();
-	screen_init();
 	timer_init();
+	mm_init(32 * 1024 * 1024);
 	scheduler_init();
 	keyboard_init();
 
 	scr_puts("Hello Ian.\n");
-
-	test_kalloc_suite();
 
 	/* setup some test tasks */
 	task_create(task1);
