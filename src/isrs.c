@@ -3,6 +3,9 @@
 #include "screen.h"
 #include "asm.h"
 
+#include "scheduler.h"
+extern u32int cur_task;
+
 /* exception error messages */
 const char *exception_messages[] = {
 	"Division By Zero",
@@ -183,5 +186,8 @@ register_dump(struct regs *registers) {
 
 	scr_puts("uSP=");
 	scr_putp32((u32int *)registers->useresp);
+
+	scr_puts(" TID=");
+	scr_putp32((u32int *)cur_task);
 	scr_putch('\n');
 }
