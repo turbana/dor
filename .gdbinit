@@ -1,3 +1,2 @@
 target remote localhost:1234
-break k_entry
-continue
+symbol-file kernel.bin
