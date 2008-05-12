@@ -370,9 +370,15 @@ irq0:				; task switching
 	push fs
 	push gs
 
+	mov eax, cr3
+	push eax		; push page directory
+
 	push esp		; pass current esp to task_switch()
 	call task_switch
 	mov esp, eax		; set esp to result of task_switch()
+
+	pop eax
+	mov cr3, eax		; restore page directory
 
 	pop gs			; restore segments
 	pop fs

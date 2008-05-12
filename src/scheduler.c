@@ -2,6 +2,7 @@
 #include "screen.h"
 #include "panic.h"
 #include "asm.h"
+#include "paging.h"
 
 /* tasks need stacks that are paged aligned */
 u8int task_stacks[TASK_MAX_COUNT][4096] __attribute__((aligned (4096)));
@@ -65,6 +66,8 @@ task_create(void (*entry)()) {
 		}
 	}
 
+	all_tasks[i].addr_space = addr_space_create();
+
 	/* initialize task's kernel stack */
 	stack = (u32int *)(task_stacks[i] + TASK_STACK_SIZE);
 	*--stack = 0x202;			/* EFLAGS */
@@ -85,6 +88,9 @@ task_create(void (*entry)()) {
 	*--stack = 0x10;			/* ES */
 	*--stack = 0x10;			/* FS */
 	*--stack = 0x10;			/* GS */
+
+	/* CR3 */
+	*--stack = (u32int)VIRT_TO_PHYS(all_tasks[i].addr_space->page_directory);
 
 	all_tasks[i].esp = (u32int)stack;
 	all_tasks[i].status = TS_READY;
