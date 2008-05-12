@@ -15,6 +15,14 @@ write_page_entry(u32int *dest, struct page_entry *entry) {
 	*dest = (entry->base_address & 0xFFFFF000) | entry->flags;
 }
 
+struct page_entry
+read_page_entry(u32int *src) {
+	struct page_entry page;
+	page.base_address = *src & 0xFFFFF000;
+	page.flags        = *src & 0x00000FFF;
+	return page;
+}
+
 void
 paging_init() {
 	u32int i, j;
