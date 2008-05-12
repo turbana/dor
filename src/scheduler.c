@@ -3,8 +3,9 @@
 #include "panic.h"
 #include "asm.h"
 
+/* tasks need stacks that are paged aligned */
+u8int task_stacks[TASK_MAX_COUNT][4096] __attribute__((aligned (4096)));
 struct task all_tasks[TASK_MAX_COUNT];
-u8int task_stacks[TASK_MAX_COUNT][TASK_STACK_SIZE];
 u32int cur_task = -1;
 
 u32int
