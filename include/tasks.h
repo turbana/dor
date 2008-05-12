@@ -2,6 +2,7 @@
 #define __TASKS_H
 
 #include "types.h"
+#include "vmm.h"
 
 struct task {
 	u32int esp;
@@ -12,6 +13,7 @@ struct task {
 		TS_BLOCKED,
 		TS_KILLED
 	} status;
+	struct addr_space *addr_space;
 };
 
 u32int task_save(struct task *task);

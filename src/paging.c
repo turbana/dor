@@ -8,7 +8,7 @@
  * memory.
  */
 static u32int lowmem_pts[5][1024] __attribute__((aligned (4096)));
-static u32int kernel_pd[1024] __attribute__((aligned (4096)));
+u32int kernel_pd[1024] __attribute__((aligned (4096)));
 
 void
 write_page_entry(u32int *dest, struct page_entry *entry) {

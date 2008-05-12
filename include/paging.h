@@ -68,6 +68,7 @@ struct page_entry {
 #define PAGE_PRESENT	0x01
 
 #define VIRT_TO_PHYS(loc) ((u8int *)loc + 0x40000000)
+#define PHYS_TO_VIRT(loc) ((u8int *)loc - 0x40000000)
 
 void write_page_entry(u32int *, struct page_entry *);
 struct page_entry read_page_entry(u32int *);
