@@ -44,6 +44,8 @@ k_entry(void) {
 	task_create(task3);
 	task_create(task4);
 	task_create(task5);
+	task_create(task6);
+	task_create(task7);
 
 	/* enable interrupts and start scheduling tasks */
 	scheduler_start();	/* never exits */

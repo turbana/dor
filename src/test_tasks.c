@@ -65,3 +65,21 @@ void task5() {
 		}
 	}
 }
+
+void task6() {
+	while(1) {
+		scr_puts("6");
+		pause();
+	}
+}
+
+void task7() {
+	scr_puts("7");
+	task_destroy(6);
+	task_destroy(7);
+
+	/* wait to be unscheduled */
+	while(1) {
+		pause();
+	}
+}
