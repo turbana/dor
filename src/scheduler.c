@@ -97,6 +97,17 @@ task_create(void (*entry)()) {
 }
 
 void
+task_destroy(u32int tid) {
+	if(0 < tid && tid < TASK_MAX_COUNT) {
+		all_tasks[tid].status = TS_KILLED;
+		if(all_tasks[tid].addr_space != (void *)0) {
+			addr_space_destroy(all_tasks[tid].addr_space);
+			all_tasks[tid].addr_space = (void *)0;
+		}
+	}
+}
+
+void
 block(u32int pid) {
 	if(all_tasks[pid].status != TS_KILLED) {
 		all_tasks[pid].status = TS_BLOCKED;
