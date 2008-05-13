@@ -77,7 +77,8 @@ task_create(void (*entry)()) {
 	*--stack = 0x0;				/* EDI */
 	*--stack = 0x0;				/* ESI */
 	*--stack = 0x0;				/* EBP */
-	*--stack = 0x0;				/* NULL */
+	*--stack = 0x0;				/* ESP (ignored)
+								 * http://www.pagetable.com/?p=8#comment-27 */
 
 	*--stack = 0x0;				/* EBX */
 	*--stack = 0x0;				/* EDX */
