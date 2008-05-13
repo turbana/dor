@@ -20,7 +20,7 @@ addr_space_create() {
 }
 
 void
-addr_space_destory(struct addr_space *as) {
+addr_space_destroy(struct addr_space *as) {
 	if(as != (struct addr_space *)0) {
 		if(as->page_directory != (u32int *)0) {
 			kfree(as->page_directory);
