@@ -121,3 +121,88 @@ dump_mem(void *low_mem, size_t length) {
 void __stack_chk_fail() {
 	PANIC("__stack_chk_fail: Kernel stack corrupted");
 }
+
+void
+_print_uhex(u32int num) {
+	char char_map[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+					   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+	scr_putch(char_map[(num >> 28) & 0xF]);
+	scr_putch(char_map[(num >> 24) & 0xF]);
+	scr_putch(char_map[(num >> 20) & 0xF]);
+	scr_putch(char_map[(num >> 16) & 0xF]);
+	scr_putch(char_map[(num >> 12) & 0xF]);
+	scr_putch(char_map[(num >> 8)  & 0xF]);
+	scr_putch(char_map[(num >> 4)  & 0xF]);
+	scr_putch(char_map[num         & 0xF]);
+}
+
+static u32int _10_powers[] = {
+	1, 10, 100, 1000, 10000, 100000,
+	1000000, 10000000, 100000000, 1000000000,
+	4294967295U	/* when printing 2**32-1 we need to mod by something larger */
+};
+
+void
+_print_s32int(s32int num) {
+	u32int val, digit, printing = 0;
+	u32int foo = (u32int)num;
+
+	if(num < 0) {
+		scr_putch('-');
+		foo = 0 - num;
+	}
+
+	for(digit = 10; digit > 0; digit--) {
+		val = (foo % _10_powers[digit]) / _10_powers[digit - 1];
+		if(val != 0 || printing || digit == 1) {
+			printing = 1;
+			scr_putch('0' + val);
+		}
+	}
+}
+
+/*
+ * Supported modifiers:
+ * 		%d	- s32int
+ * 		%X	- uppercase hex of a u32int
+ * 		%c	- char
+ * 		%s	- string
+ * 		%%	- percent (%)
+ */
+void
+kprintf(const char *fmt, ...) {
+	va_list args;
+	u32int i;
+
+	va_start(args, fmt);
+	for(i = 0; i < strlen(fmt); i++) {
+		if(fmt[i] != '%') {
+			scr_putch(fmt[i]);
+		} else {
+			i++;
+			switch(fmt[i]) {
+
+			case '%':
+				scr_putch('%');
+				break;
+
+			case 'X': case 'p':
+				_print_uhex(va_arg(args, u32int));
+				break;
+
+			case 'd':
+				_print_s32int(va_arg(args, s32int));
+				break;
+
+			case 'c':
+				scr_putch(va_arg(args, int));
+				break;
+
+			case 's':
+				scr_puts(va_arg(args, char *));
+				break;
+			}
+		}
+	}
+	va_end(args);
+}
