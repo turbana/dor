@@ -25,8 +25,8 @@ memsetw(u16int *dest, u16int value, size_t count) {
 	return dest;
 }
 
-size_t
-strlen(const u8int *string) {
+u32int
+strlen(const char *string) {
 	size_t size;
 	for(size=0; *string != '\0'; string++) size++;
 	return size;

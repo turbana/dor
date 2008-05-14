@@ -12,8 +12,8 @@ memset(void *dest, u8int value, size_t count);
 u16int *
 memsetw(u16int *dest, u16int value, size_t count);
 
-size_t
-strlen(const u8int *string);
+u32int
+strlen(const char *string);
 
 u8int
 inb(u16int _port);
