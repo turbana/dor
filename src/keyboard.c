@@ -1,5 +1,4 @@
 #include "keyboard.h"
-#include "screen.h"
 #include "irq.h"
 #include "sys.h"
 
@@ -30,7 +29,7 @@ keyboard_handler(struct regs *registers) {
 		/* key released, noop */
 	} else {
 		/* key pressed */
-		scr_putch(kbdus[scancode]);
+		kprintf("%c", kbdus[scancode]);
 	}
 }
 

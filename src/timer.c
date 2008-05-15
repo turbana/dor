@@ -15,19 +15,19 @@ timer_phase(u32int hz) {
 
 void
 timer_handler(struct regs *registers) {
-	timer_ticks++;
-	registers = 0;
 #ifdef TICK_REMINDER
 	static u8int color = COLOR_BLACK;
+#endif
+	timer_ticks++;
+	registers = 0;
 
+#ifdef TICK_REMINDER
 	if(timer_ticks % 100 == 0) {
 		color = (color + 1) % 8;
-		scr_set_color(COLOR_GREY, COLOR_BLACK);
-		scr_puts("One ");
 		scr_set_color(color | COLOR_BRIGHT, COLOR_BLACK);
-		scr_puts("second");
+		kprintf("%d ", timer_ticks / 100);
 		scr_set_color(COLOR_GREY, COLOR_BLACK);
-		scr_puts(" has passed.\n");
+		kprintf("seconds have passed.\n");
 	}
 #endif
 }

@@ -1,6 +1,6 @@
 #include "test_tasks.h"
 #include "scheduler.h"
-#include "screen.h"
+#include "sys.h"
 #include "asm.h"
 
 void pause() {
@@ -9,7 +9,7 @@ void pause() {
 
 void task1() {
 	while(1) {
-		scr_putch('1');
+		kprintf("1");
 		unblock(3);
 		block(2);
 		block(4);
@@ -19,7 +19,7 @@ void task1() {
 
 void task2() {
 	while(1) {
-		scr_putch('2');
+		kprintf("2");
 		unblock(4);
 		block(3);
 		block(1);
@@ -29,7 +29,7 @@ void task2() {
 
 void task3() {
 	while(1) {
-		scr_putch('3');
+		kprintf("3");
 		unblock(2);
 		block(1);
 		pause();
@@ -38,7 +38,7 @@ void task3() {
 
 void task4() {
 	while(1) {
-		scr_putch('4');
+		kprintf("4");
 		unblock(1);
 		pause();
 	}
@@ -57,11 +57,7 @@ void task5() {
 	while(1) {
 		for(i=1; i<50; i++) {
 			n = fib(i);
-			scr_puts("\nThe fibonacci number of ");
-			scr_putp32((u32int *)i);
-			scr_puts(" is ");
-			scr_putp32((u32int *)n);
-			scr_putch('\n');
+			kprintf("\nThe fibonacci number of %d is %d\n", i, n);
 		}
 	}
 }

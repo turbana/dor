@@ -2,6 +2,7 @@
 #include "isrs.h"
 #include "screen.h"
 #include "asm.h"
+#include "sys.h"
 
 #include "scheduler.h"
 extern u32int cur_task;
@@ -89,8 +90,8 @@ void
 fault_handler(struct regs *registers) {
 	if(registers->int_no < 32) {
 		scr_set_color(COLOR_RED | COLOR_BRIGHT, COLOR_BLACK);
-		scr_puts(exception_messages[registers->int_no]);
-		scr_puts(" Exception. Halting System!\n");
+		kprintf("%s Exception. Halting System!\n",
+				exception_messages[registers->int_no]);
 		scr_set_color(COLOR_GREY, COLOR_BLACK);
 		register_dump(registers);
 		ASM("cli\n\t"
@@ -100,94 +101,29 @@ fault_handler(struct regs *registers) {
 
 void
 register_dump(struct regs *registers) {
-	u32int reg;
+	u32int cr0, cr2, cr3, cr4;
+
+	/* read in control registers */
+	ASM("mov %%cr0, %0" : "=g" (cr0));
+	ASM("mov %%cr2, %0" : "=g" (cr2));
+	ASM("mov %%cr3, %0" : "=g" (cr3));
+	ASM("mov %%cr4, %0" : "=g" (cr4));
 
 	/* base registers */
-	scr_puts("EAX=");
-	scr_putp32((u32int *)registers->eax);
-
-	scr_puts(" EBX=");
-	scr_putp32((u32int *)registers->ebx);
-
-	scr_puts(" ECX=");
-	scr_putp32((u32int *)registers->ecx);
-
-	scr_puts(" EDX=");
-	scr_putp32((u32int *)registers->edx);
-	scr_putch('\n');
-
-	/* other registers */
-	scr_puts("ESI=");
-	scr_putp32((u32int *)registers->esi);
-
-	scr_puts(" EDI=");
-	scr_putp32((u32int *)registers->edi);
-
-	scr_puts(" EBP=");
-	scr_putp32((u32int *)registers->ebp);
-
-	scr_puts(" ESP=");
-	scr_putp32((u32int *)registers->esp);
-	scr_putch('\n');
-
-	scr_puts("EIP=");
-	scr_putp32((u32int *)registers->eip);
-
-	scr_puts(" EFL=");
-	scr_putp32((u32int *)registers->eflags);
-	scr_putch('\n');
-
-	/* control registers */
-	ASM("mov %%cr0, %0" : "=g" (reg));
-	scr_puts("CR0=");
-	scr_putp32((u32int *)reg);
-
-	ASM("mov %%cr2, %0" : "=g" (reg));
-	scr_puts(" CR2=");
-	scr_putp32((u32int *)reg);
-
-	ASM("mov %%cr3, %0" : "=g" (reg));
-	scr_puts(" CR3=");
-	scr_putp32((u32int *)reg);
-
-	ASM("mov %%cr4, %0" : "=g" (reg));
-	scr_puts(" CR4=");
-	scr_putp32((u32int *)reg);
-
-	scr_putch('\n');
-
-	/* segment registers */
-	scr_puts("CS =");
-	scr_putp32((u32int *)registers->cs);
-
-	scr_puts(" DS =");
-	scr_putp32((u32int *)registers->ds);
-
-	scr_puts(" SS =");
-	scr_putp32((u32int *)registers->ss);
-
-	scr_puts("\nES =");
-	scr_putp32((u32int *)registers->es);
-
-	scr_puts(" GS =");
-	scr_putp32((u32int *)registers->gs);
-
-	scr_puts(" FS =");
-	scr_putp32((u32int *)registers->fs);
-	scr_putch('\n');
-
-	/* others */
-	scr_puts("INT=");
-	scr_putp32((u32int *)registers->int_no);
-
-	scr_puts(" ERR=");
-	scr_putp32((u32int *)registers->err_code);
-	scr_putch('\n');
-
-	scr_puts("uSP=");
-	scr_putp32((u32int *)registers->useresp);
-
-	scr_puts(" TID=");
-	scr_putp32((u32int *)cur_task);
-	scr_putch('\n');
+	kprintf("EAX=%X EBX=%X ECX=%X EDX=%X\n"
+			"ESI=%X EDI=%X EBP=%X ESP=%X\n"
+			"EIP=%X EFL=%X\n"
+			"CR0=%X CR2=%X CR3=%X CR4=%X\n"
+			"CS =%X DS =%X SS =%X\n"
+			"ES =%X GS =%X FS =%X\n"
+			"INT=%X ERR=%X\n"
+			"uSP=%X TID=%d\n",
+			registers->eax, registers->ebx, registers->ecx, registers->edx,
+			registers->esi, registers->edi, registers->ebp, registers->esp,
+			registers->eip, registers->eflags,
+			cr0, cr2, cr3, cr4,
+			registers->cs, registers->ds, registers->ss,
+			registers->es, registers->gs, registers->fs,
+			registers->int_no, registers->err_code,
+			registers->useresp, cur_task);
 }

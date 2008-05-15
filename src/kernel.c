@@ -36,7 +36,7 @@ k_entry(void) {
 	scheduler_init();
 	keyboard_init();
 
-	scr_puts("Hello Ian.\n");
+	kprintf("Hello Ian.\n");
 
 	/* setup some test tasks */
 	task_create(task1);

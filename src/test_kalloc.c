@@ -89,9 +89,7 @@ test_kalloc_large_alloc() {
 u32int
 run_test(const char *name, u32int (*test)(void)) {
 	scr_set_color(COLOR_GREY, COLOR_BLACK);
-	scr_puts("     | ");
-	scr_puts(name);
-
+	kprintf("     | %s", name);
 	return test();
 }
 
@@ -104,7 +102,7 @@ test_kalloc_suite() {
 	u32int num_tests = 3;
 	u32int i;
 
-	scr_puts("Test suite for kalloc:\n");
+	kprintf("Test suite for kalloc:\n");
 	for(i = 0; i < num_tests; i++) {
 		if(!run_test(names[i], funcs[i])) {
 			ret_val = 0;

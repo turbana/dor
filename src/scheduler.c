@@ -3,6 +3,7 @@
 #include "panic.h"
 #include "asm.h"
 #include "paging.h"
+#include "sys.h"
 
 /* tasks need stacks that are paged aligned */
 u8int task_stacks[TASK_MAX_COUNT][4096] __attribute__((aligned (4096)));
@@ -110,7 +111,7 @@ unblock(u32int pid) {
 void
 _idle_task() {
 	while(1) {
-		scr_putch('.');
+		kprintf(".");
 		ASM("hlt");
 	}
 }

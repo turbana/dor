@@ -69,16 +69,12 @@ dump_mem(void *low_mem, size_t length) {
 	memset(row, ' ', 81);
 	row[80] = '\0';
 
-	scr_puts("Memory dump of 0x");
-	scr_putp32(low_mem);
-	scr_puts(" to 0x");
-	scr_putp32(high);
-	scr_puts(":\n");
+	kprintf("Memory dump of 0x%X - 0x%X:\n", low_mem, high);
 
 	do {
 		if(col == 0) {
 			/* print the memory address */
-			scr_putp32(ptr);
+			kprintf("%X", ptr);
 			col = 9;
 		}
 
@@ -104,7 +100,7 @@ dump_mem(void *low_mem, size_t length) {
 
 		/* check for end of line */
 		if(col == 60) {
-			scr_puts(row + 8);
+			kprintf(row + 8);
 			/* reset the line */
 			memset(row, ' ', 80);
 			col = 0;
@@ -114,7 +110,7 @@ dump_mem(void *low_mem, size_t length) {
 
 	/* if we had extra characters print what we have left */
 	if(col > 0) {
-		scr_puts(row);
+		kprintf(row);
 	}
 }
 
