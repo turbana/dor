@@ -1,6 +1,8 @@
 #ifndef __TYPES_H
 #define __TYPES_H
 
+#define NULL (void *)0
+
 typedef unsigned long size_t;
 
 typedef unsigned char      u8int;
