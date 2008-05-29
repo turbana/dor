@@ -32,6 +32,27 @@ strlen(const char *string) {
 	return size;
 }
 
+void *
+strcpy(char *dest, char *src) {
+	return memcpy(dest, src, strlen(src) + 1);
+}
+
+u32int
+strcmp(char *left, char *right) {
+	while(1) {
+		if(*left == '\0' || *right == '\0') {
+			return (*left == *right) ? 0 : 1;
+		}
+
+		if(*left != *right) {
+			return 1;
+		}
+
+		left++;
+		right++;
+	}
+}
+
 u8int
 inb(u16int _port) {
 	u8int ret;
