@@ -57,18 +57,18 @@ version :
 	@echo "MTOOLS " `mtools --version | head -n1`
 
 run : fdimage.img
-	@echo "RUN  qemu"
+	@echo "RUN	qemu"
 	@$(QEMU) $(QFLAGS) -fda fdimage.img
 
 debug : fdimage.img
-	@echo "RUN  qemu debug"
+	@echo "RUN	qemu debug"
 	@$(QEMU) $(QFLAGS) -s -S -fda fdimage.img &
 	@sleep 1
-	@echo "GDB  kernel.bin"
+	@echo "GDB	kernel.bin"
 	@$(GDB) kernel.bin
 
-fdimage.img : $(BDIR) kernel.bin grub/stage1 grub/stage2 grub/menu.lst
-	@echo "DD   $@"
+fdimage.img : $(BDIR) kernel.bin initrd.bin grub/stage1 grub/stage2 grub/menu.lst
+	@echo "CREATE	$@"
 	@$(DD) if=/dev/zero of=fdimage.img bs=512 count=2880 2> /dev/null
 	@$(ECHO) 'drive a: file="fdimage.img"' > mtoolsrc
 	@MTOOLSRC=mtoolsrc mformat -f 1440 a:
@@ -83,24 +83,24 @@ fdimage.img : $(BDIR) kernel.bin grub/stage1 grub/stage2 grub/menu.lst
 	@$(RM) mtoolsrc bmap
 
 grub/% :
-	@echo "CP   $@"
+	@echo "CP	$@"
 	@$(CP) /boot/$@ $@
 
 $(BDIR) :
-	@echo "DIR  $@"
+	@echo "DIR	$@"
 	@mkdir $@
 
 kernel.bin : $(BOBJS) $(SDIR)/kernel.ld
-	@echo "LINK $@"
+	@echo "LINK	$@"
 	@$(LD) $(LDFLAGS) -T $(SDIR)/kernel.ld -o kernel.bin $(BOBJS)
 	@$(MBCHK) kernel.bin > /dev/null
 
 $(BDIR)/%.o : %.asm
-	@echo "AS   $(<F)"
+	@echo "AS	$(<F)"
 	@$(AS) $(ASFLAGS) $< -o $@
 
 $(BDIR)/%.o : %.c $(IDIR)/%.h
-	@echo "CC   $(<F)"
+	@echo "CC	$(<F)"
 	@$(CC) $(CFLAGS) -MMD -MP -MT "build/$(@F)" -c $< -o $@
 
 clean :
