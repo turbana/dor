@@ -48,7 +48,7 @@ kernel : kernel.bin
 version :
 	@echo "Build tools versions:"
 	@echo "---------------------"
-	@echo "KERNEL " `git tag`
+	@echo "KERNEL " `git tag | tail -n1`
 	@echo "CC     " `$(CC) -v 2>&1 | tail -n1`
 	@echo "LD     " `$(LD) -v`
 	@echo "AS     " `$(AS) -v`
