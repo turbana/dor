@@ -4,3 +4,4 @@ timeout=0
 
 title Custom Kernel
 	kernel /kernel.bin
+	module /initrd.bin

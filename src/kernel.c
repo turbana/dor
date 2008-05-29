@@ -14,6 +14,7 @@
 #include "mm.h"
 #include "multiboot.h"
 #include "assert.h"
+#include "initrd.h"
 
 #include "test_kalloc.h"
 #include "test_tasks.h"
@@ -69,6 +70,18 @@ display_mboot(u32int mb_magic, struct multiboot_header *mboot) {
 
 
 void
+load_modules(struct multiboot_module *module, u32int count) {
+	u32int i;
+
+	for(i = 0; i < count; i++, module++) {
+		if(!strcmp((char *)module->string, "/initrd.bin")) {
+			initrd_init(module->mod_start);
+		}
+	}
+}
+
+
+void
 k_entry(u32int mb_magic, struct multiboot_header *mboot) {
 	paging_init();
 	gdt_init();
@@ -92,13 +105,19 @@ k_entry(u32int mb_magic, struct multiboot_header *mboot) {
 	ASSERT(mb_magic == MB_HEADER_MAGIC);
 	display_mboot(mb_magic, mboot);
 
+	load_modules((struct multiboot_module *)mboot->mods_addr,
+				 mboot->mods_count);
+
 	kprintf("Hello Ian.\n");
 
 	/* setup some test tasks */
-	task_create(task1);
+/*	task_create(task1);
 	task_create(task2);
 	task_create(task3);
 	task_create(task4);
+	task_create(task5);*/
+
+	initrd_list();
 
 	/* enable interrupts and start scheduling tasks */
 	scheduler_start();	/* never exits */

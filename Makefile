@@ -22,7 +22,8 @@ OBJS  := $(notdir $(patsubst %.c,   %.o, $(SRCS)) \
 				  $(patsubst %.asm, %.o, $(ASMS)))
 BOBJS := $(addprefix $(BDIR)/, $(OBJS))
 DEPS  := $(patsubst %.c, %.d, $(SRCS))
-CLEAN := $(OBJS) $(DEPS) kernel.bin fdimage.img core* $(BDIR)
+CLEAN := $(OBJS) $(DEPS) kernel.bin fdimage.img core* $(BDIR) initrd.bin \
+		 utils/initrd
 
 CFLAGS  := -Wall -Werror -O -g -fstrength-reduce -finline-functions -nostdinc \
 		   -fno-builtin -pedantic -pedantic-errors -Wextra \
@@ -76,6 +77,7 @@ fdimage.img : $(BDIR) kernel.bin initrd.bin grub/stage1 grub/stage2 grub/menu.ls
 	@MTOOLSRC=mtoolsrc mmd   a:/boot/grub
 	@MTOOLSRC=mtoolsrc mcopy grub/* a:/boot/grub/
 	@MTOOLSRC=mtoolsrc mcopy kernel.bin a:/
+	@MTOOLSRC=mtoolsrc mcopy initrd.bin a:/
 	@$(ECHO) "(fd0) fdimage.img" > bmap
 	@$(ECHO) -e "root (fd0)\nsetup (fd0)\nquit" | \
 		$(GRUB) --batch --device-map=bmap > /dev/null
@@ -85,6 +87,18 @@ fdimage.img : $(BDIR) kernel.bin initrd.bin grub/stage1 grub/stage2 grub/menu.ls
 grub/% :
 	@echo "CP	$@"
 	@$(CP) /boot/$@ $@
+
+initrd.bin : utils/initrd initrd/
+	@echo "CREATE	$@"
+	@for file in initrd/*; do \
+		ARGS="$$ARGS $$file `basename $$file`"; \
+	done; \
+	utils/initrd initrd.bin $$ARGS
+	@touch initrd.bin
+
+utils/initrd : utils/initrd.c $(IDIR)/initrd.h
+	@echo "CC	$<"
+	@$(CC) $< -o $@
 
 $(BDIR) :
 	@echo "DIR	$@"
