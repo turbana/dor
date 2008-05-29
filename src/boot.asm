@@ -50,6 +50,8 @@ ALIGN 4
 global entry
 extern k_entry
 entry:				; execution starts in low memory
+	mov ecx, eax		; save multiboot bootloader magic
+
 	lgdt [fgdt_ptr]		; load the fake GDT
 	mov ax, 0x10
 	mov ds, ax
@@ -61,6 +63,8 @@ entry:				; execution starts in low memory
 	jmp 0x08:.highmem
 .highmem:			; we are now executing in high memory
 	mov esp, _sys_stack	; set up stack pointer
+	push ebx		; push multiboot header pointer
+	push ecx		; push multiboot bootloader magic
 	call k_entry		; jump to our entry point
 	cli
 	hlt
