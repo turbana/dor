@@ -7,8 +7,7 @@
 #define KALLOC_CLEAR
 
 /* 16mb for the kernel heap */
-#define KMEM_LOW	((u8int *)0xC0140000)
-#define KMEM_HIGH	((u8int *)0xC1140000)
+#define KMEM_SIZE	0x01000000
 
 void *kalloc(size_t size);
 void kfree(void *ptr);

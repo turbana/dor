@@ -19,6 +19,8 @@
 #include "test_kalloc.h"
 #include "test_tasks.h"
 
+extern u32int end;
+
 void
 display_mboot(u32int mb_magic, struct multiboot_header *mboot) {
 	struct multiboot_module *module;
@@ -81,12 +83,32 @@ load_modules(struct multiboot_module *module, u32int count) {
 }
 
 
+void *
+first_free_mem(struct multiboot_header *mboot) {
+	u32int addr;
+	struct multiboot_module *module;
+
+	if((mboot->flags & MB_FLAG_MODS) && mboot->mods_count > 0) {
+		module = (struct multiboot_module *)mboot->mods_addr;
+		module += mboot->mods_count - 1;
+		addr = (module->mod_end & 0xFFFFF000) + 0x1000;
+	} else {
+		addr = end; /* end defined in linker script as the end of kernel */
+	}
+
+	return PHYS_TO_VIRT(addr);
+}
+
+
 void
 k_entry(u32int mb_magic, struct multiboot_header *mboot) {
+	/* ensure we have a correct multiboot header */
+	ASSERT(mb_magic == MB_HEADER_MAGIC);
+
 	paging_init();
 	gdt_init();
-	kalloc_init();
 	screen_init();
+	kalloc_init(first_free_mem(mboot));
 
 	if(!test_kalloc_suite()) {
 		ASM("cli\n\t"
@@ -101,8 +123,6 @@ k_entry(u32int mb_magic, struct multiboot_header *mboot) {
 	scheduler_init();
 	keyboard_init();
 
-	/* ensure we have a correct multiboot header */
-	ASSERT(mb_magic == MB_HEADER_MAGIC);
 	display_mboot(mb_magic, mboot);
 
 	load_modules((struct multiboot_module *)mboot->mods_addr,
