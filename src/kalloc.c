@@ -1,4 +1,5 @@
 #include "kalloc.h"
+#include "screen.h"
 
 struct memnode {
 	u8int  message[4];
@@ -10,7 +11,7 @@ struct memnode {
 struct memnode *free_list;
 struct memnode *used_list;
 
-#include "screen.h"
+u32int kheap_start;
 
 void *
 kalloc(size_t size) {
@@ -147,6 +148,8 @@ void
 kalloc_init(u8int *heap_start) {
 	struct memnode node;
 	size_t ssize = sizeof(struct memnode);
+
+	kheap_start = (u32int)heap_start;
 
 	/* dummy head node for our used list */
 	memcpy(node.message, "USED", 4);	/* debugging identifier */

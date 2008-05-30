@@ -3,6 +3,8 @@
 #include "screen.h"
 #include "sys.h"
 
+extern u32int kheap_start;
+
 u32int
 test_kalloc_same_alloc() {
 	void *loc1, *loc2;

@@ -8,7 +8,7 @@
 	scr_set_color(COLOR_RED | COLOR_BRIGHT, COLOR_BLACK); \
 	kprintf("\rFAIL\n%s\n", message); \
 	scr_set_color(COLOR_GREY, COLOR_BLACK); \
-	dump_mem(KMEM_LOW, 256); \
+	dump_mem((u8int *)kheap_start, 256); \
 	return 0;
 
 #define PASS() \
