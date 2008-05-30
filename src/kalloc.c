@@ -1,4 +1,5 @@
 #include "kalloc.h"
+#include "screen.h"
 
 struct memnode {
 	u8int  message[4];
@@ -10,7 +11,7 @@ struct memnode {
 struct memnode *free_list;
 struct memnode *used_list;
 
-#include "screen.h"
+u32int kheap_start;
 
 void *
 kalloc(size_t size) {
@@ -144,33 +145,35 @@ kfree(void *ptr) {
 }
 
 void
-kalloc_init() {
+kalloc_init(u8int *heap_start) {
 	struct memnode node;
 	size_t ssize = sizeof(struct memnode);
+
+	kheap_start = (u32int)heap_start;
 
 	/* dummy head node for our used list */
 	memcpy(node.message, "USED", 4);	/* debugging identifier */
 	node.size = 0;						/* we're just a dummy node */
 	/* wrap around to our self */
-	node.prev = (struct memnode *)KMEM_LOW;
-	node.next = (struct memnode *)KMEM_LOW;
-	memcpy(KMEM_LOW, &node, ssize);
+	node.prev = (struct memnode *)heap_start;
+	node.next = (struct memnode *)heap_start;
+	memcpy(heap_start, &node, ssize);
 
 	/* dummy head node for our free list */
 	memcpy(node.message, "FREE", 4);
 	node.size = 0;
-	node.prev = (struct memnode *)(KMEM_LOW + ssize);
-	node.next = (struct memnode *)(KMEM_LOW + ssize * 2);
-	memcpy(KMEM_LOW + ssize, &node, ssize);
+	node.prev = (struct memnode *)(heap_start + ssize);
+	node.next = (struct memnode *)(heap_start + ssize * 2);
+	memcpy(heap_start + ssize, &node, ssize);
 
 	/* first node in our free list */
 	memcpy(node.message, "FREE", 4);
 	/* everything, but these 3 nodes are free */
-	node.size = KMEM_HIGH - KMEM_LOW - ssize * 3;
-	node.prev = (struct memnode *)(KMEM_LOW + ssize);
-	node.next = (struct memnode *)(KMEM_LOW + ssize);
-	memcpy(KMEM_LOW + ssize * 2, &node, ssize);
+	node.size = KMEM_SIZE - ssize * 3;
+	node.prev = (struct memnode *)(heap_start + ssize);
+	node.next = (struct memnode *)(heap_start + ssize);
+	memcpy(heap_start + ssize * 2, &node, ssize);
 
-	used_list = (struct memnode *)KMEM_LOW;
-	free_list = (struct memnode *)(KMEM_LOW + ssize);
+	used_list = (struct memnode *)heap_start;
+	free_list = (struct memnode *)(heap_start + ssize);
 }
